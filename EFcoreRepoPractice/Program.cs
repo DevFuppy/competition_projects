@@ -20,7 +20,10 @@ builder.Services.AddControllersWithViews();
 var connectionStringAjaxClass = builder.Configuration.GetConnectionString("ajaxClass");
 builder.Services.AddDbContext<AjaxClassContext>(options => options.UseSqlServer(connectionStringAjaxClass));
 
+//其實是語法糖
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+//通用版
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 builder.Services.AddScoped<GetMemberDetailHandler>();
 
@@ -48,7 +51,7 @@ app.MapStaticAssets();
 app.MapControllerRoute(
     name: "default",
     //pattern: "{controller=Home}/{action=Index}/{id?}")
-    pattern: "{controller=Member}/{action=Get}/{id=1}")
+    pattern: "{controller=Member}/{action=GetAll}")
     .WithStaticAssets();
 
 app.MapRazorPages()
