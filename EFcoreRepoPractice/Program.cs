@@ -22,6 +22,7 @@ builder.Services.AddDbContext<AjaxClassContext>(options => options.UseSqlServer(
 
 //其實是語法糖
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 //通用版
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 

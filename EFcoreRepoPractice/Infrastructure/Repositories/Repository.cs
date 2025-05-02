@@ -20,14 +20,7 @@ namespace EFcoreRepoPractice.Infrastructure.repos
 
 
         public async Task<IEnumerable<T?>> GetAllAsync(CancellationToken ct = default)
-        {
-            Console.WriteLine(Environment.UserName);
-
-
-            return await _dbSet.AsNoTracking().ToListAsync();
-        
-        
-        } 
+       => await _dbSet.AsNoTracking().ToListAsync();
 
 
 
