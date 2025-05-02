@@ -3,6 +3,7 @@ using EFcoreRepoPractice.Application.Queries;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
 
 namespace EFcoreRepoPractice.Controllers
@@ -16,20 +17,33 @@ namespace EFcoreRepoPractice.Controllers
         //private readonly GetMemberDetailHandler _handler;
         //public MemberController(GetMemberDetailHandler handler) => _handler = handler;
         //public MemberController(IMemberRepository memberRepository) => _memberRepository = memberRepository;
+        private readonly AjaxClassContext _context;
 
 
         //private readonly IMemberRepository _memberRepository;
         private readonly IRepository<Member> _memberRepository;
-        public MemberController(IRepository<Member> IRepo) => _memberRepository = IRepo;
-
-
-
-        //[HttpPost]
-
-        public IActionResult Index()
+        public MemberController(IRepository<Member> IRepo, AjaxClassContext context)
         {
-            return View();
+            _memberRepository = IRepo;
+            _context = context;
         }
+
+
+
+        ////[HttpPost]
+
+        //public IActionResult Index()
+        //{
+        //    return View();
+        //}
+
+        //public IActionResult Index()
+        //{
+        //    var list = _context.Members.AsNoTracking().ToList(); // 不用 async，模仿 ADO.NET 行為
+        //    return View(list);
+        //}
+
+
 
         //("{id:int}")
         //[HttpGet("{id:int}")]
@@ -51,7 +65,7 @@ namespace EFcoreRepoPractice.Controllers
             //var dto = await _handler.Handler(new(id), ct);
             var members = await _memberRepository.GetAllAsync(ct);
 
-            var dto = members.Select(x=>new {Id=x.MemberId,x.Name,x.Email,x.Age,x.Password });
+            var dto = members.Select(x => new { Id = x.MemberId, x.Name, x.Email, x.Age, x.Password });
 
             return dto is null ? NotFound() : Ok(dto);
         }
@@ -112,15 +126,15 @@ namespace EFcoreRepoPractice.Controllers
             {
                 return NotFound();
             }
-        
 
-        await _memberRepository.DeleteAsync(existing, ct);
-        await _memberRepository.Save();
 
-                //var dto = await _memberRepository.CreateAsync(dto., ct);
+            await _memberRepository.DeleteAsync(existing, ct);
+            await _memberRepository.Save();
 
-                return NoContent();
-    }
+            //var dto = await _memberRepository.CreateAsync(dto., ct);
+
+            return NoContent();
+        }
 
         /// <summary>
         /// 表達式新寫法
