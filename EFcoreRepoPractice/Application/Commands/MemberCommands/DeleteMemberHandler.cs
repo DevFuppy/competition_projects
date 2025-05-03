@@ -32,10 +32,10 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
                 await entity.Save(ct);
 
             });
-            
 
 
-            return new MemberDTO(existing.MemberId, existing.Name, existing.Email);
+                                                             /*也可以在DTO就?設定nullable*/
+            return new MemberDTO(existing.MemberId, existing.Name, existing.Email?? "" );
         }
 
 
