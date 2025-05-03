@@ -24,10 +24,14 @@ namespace EFcoreRepoPractice.Controllers
         //private readonly IMemberRepository _memberRepository;
         private readonly IRepository<Member> _memberRepository;
         private readonly IUnitOfWork _uow;
-        public MemberController(IRepository<Member> IRepo, IUnitOfWork unow)
+        private readonly GetMemberDetailHandler _memberHandler;
+
+        public MemberController(IRepository<Member> IRepo, IUnitOfWork unow, GetMemberDetailHandler memberHandler   )
         {
             _memberRepository = IRepo;
             _uow = unow;
+            _memberHandler = memberHandler;
+
             //_context = context;
         }
 
@@ -56,12 +60,12 @@ namespace EFcoreRepoPractice.Controllers
 
             //var dto = await _handler.Handler(new(id), ct);
             //var dto = await _memberRepository.GetAsync(id, ct);
-            var entity = _uow.GetRepository<Member>();
-            var model = await entity.GetAsync(id, ct);
-                       
+            //var entity = _uow.GetRepository<Member>();
+            //var model = await entity.GetAsync(id, ct);
+            var handler = await _memberHandler.GetMemberHandler(new(id),ct);           
             
 
-            return model is null ? NotFound() : Ok(new MemberDTO(model.MemberId, model.Name, model.Email));
+            return handler is null ? NotFound() : Ok(handler);
         }
 
 

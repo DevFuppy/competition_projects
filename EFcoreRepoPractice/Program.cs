@@ -1,3 +1,4 @@
+
 using EFcoreRepoPractice.Application.Queries;
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
@@ -29,10 +30,11 @@ builder.Services.AddDbContext<AjaxClassContext>(options => options.UseSqlServer(
 //其實是語法糖
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<GetMemberDetailHandler>();
 //通用版
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-builder.Services.AddScoped<GetMemberDetailHandler>();
+
 
 var app = builder.Build();
 

@@ -1,20 +1,27 @@
 ﻿using EFcoreRepoPractice.Application.DTos;
+using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
+using EFcoreRepoPractice.Models;
 
 namespace EFcoreRepoPractice.Application.Queries
 {
-    public class GetMemberDetailHandler
+    public class GetMemberDetailHandler 
     {
-        private readonly IMemberRepository _repo;
+        private IUnitOfWork _uow;
 
-        public GetMemberDetailHandler(IMemberRepository repo) =>_repo =repo;
+        public GetMemberDetailHandler(IUnitOfWork uow) => _uow = uow;
 
-        public async Task<MemberDTO?> Handler(GetMemberDetailQuery q, CancellationToken ct = default)
+        public async Task<MemberDTO?> GetMemberHandler(GetDetailQueryById  q, CancellationToken ct = default)
         {
-            var m = await _repo.GetAsync(q.Id, ct);
+             
 
-            return m is null ? null : new MemberDTO(m.MemberId, m.Name,m.Email);        
-        
+            var entity = _uow.GetRepository<Member>();
+            var model = await entity.GetAsync(q.Id, ct);
+
+
+            return model is null ? null : new MemberDTO(model.MemberId, model.Name, model.Email);        
+
+
         }
 
     }
