@@ -12,7 +12,7 @@ namespace EFcoreRepoPractice.Data
         private readonly AjaxClassContext _context;
         private IDbContextTransaction _transaction;
 
-        public UnitOfWork( AjaxClassContext context, IServiceProvider provider = null)
+        public UnitOfWork(AjaxClassContext context, IServiceProvider provider = null)
         {
             _provider = provider;
             _context = context;
@@ -24,17 +24,17 @@ namespace EFcoreRepoPractice.Data
 
         //IRepository<T> b = _provider.GetRequiredService<IRepository<T>>();
 
-        public async Task Save(CancellationToken ct)=>
+        public async Task Save(CancellationToken ct) =>
 
             await _context.SaveChangesAsync(ct);
 
 
-        
-        public async Task BeginTransactionAsync() 
-        {
-             _transaction = await _context.Database.BeginTransactionAsync();           
 
-        } 
+        public async Task BeginTransactionAsync()
+        {
+            _transaction = await _context.Database.BeginTransactionAsync();
+
+        }
 
         public async Task CommitTransactionAsync()
         {
@@ -47,6 +47,35 @@ namespace EFcoreRepoPractice.Data
             await _transaction.RollbackAsync();
 
         }
+
+
+        public async Task ExecuteTransactionAsync(Func<Task> acuAction)
+        {
+
+            {
+                _transaction = await _context.Database.BeginTransactionAsync();
+
+                try
+                {
+
+                    await acuAction();
+                    await _transaction.CommitAsync();
+
+                }
+                catch
+                {
+
+                    await _transaction.RollbackAsync();
+                    throw;
+
+                }
+
+            }
+
+
+
+
+}
 
 
 

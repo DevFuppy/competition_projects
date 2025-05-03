@@ -19,24 +19,16 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
             var entity = _uow.GetRepository<Member>();
             var member = new Member { Name = q.Name, Email = q.Email, Age = q.Age };
 
-            
-            await _uow.BeginTransactionAsync();
 
-            try
+            await _uow.ExecuteTransactionAsync(async () =>
             {
 
                 await entity.CreateAsync(member, ct);
-                await entity.Save();                
-                await _uow.CommitTransactionAsync();
+                await entity.Save();
 
-            }
-            catch
-            {
+            });
 
-                await _uow.RollbackTransactionAsync();
-                throw;
 
-            }
 
 
             return new MemberDTO(member.MemberId, member.Name, member.Email);
