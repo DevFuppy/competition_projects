@@ -17,8 +17,14 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
-var connectionStringAjaxClass = builder.Configuration.GetConnectionString("ajaxClass");
+//公司
+var connectionStringAjaxClass2 = builder.Configuration.GetConnectionString("ajaxClass");
+builder.Services.AddDbContext<AjaxClassContext>(options => options.UseSqlServer(connectionStringAjaxClass2));
+
+//在家
+var connectionStringAjaxClass = builder.Configuration.GetConnectionString("atHome");
 builder.Services.AddDbContext<AjaxClassContext>(options => options.UseSqlServer(connectionStringAjaxClass));
+
 
 //其實是語法糖
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
