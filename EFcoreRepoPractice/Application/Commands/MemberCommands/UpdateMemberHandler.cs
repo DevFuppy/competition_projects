@@ -26,13 +26,30 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
              
 
             existing.Name = q.Name;
-
             existing.Email = q.Email;
-
             existing.Age = q.Age;
 
-            await entity.UpdateAsync(existing);
-            await entity.Save(ct);
+
+            await _uow.BeginTransactionAsync();
+
+            try
+            {
+                await entity.UpdateAsync(existing);
+                await entity.Save(ct);
+                await _uow.CommitTransactionAsync();
+
+            }
+            catch
+            {
+                await _uow.RollbackTransactionAsync();
+                throw;
+
+
+
+            }
+
+
+
 
             return new MemberDTO(existing.MemberId, existing.Name, existing.Email);
 

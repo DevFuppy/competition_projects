@@ -24,9 +24,24 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
                 return null;
             }
 
+            await _uow.BeginTransactionAsync();
 
-            await entity.DeleteAsync(existing);
-            await entity.Save(ct);
+            try
+            {
+                await entity.DeleteAsync(existing);
+                await entity.Save(ct);
+
+                await _uow.CommitTransactionAsync();
+
+            }
+            catch
+            {
+                await _uow.RollbackTransactionAsync();
+                throw;
+
+
+
+            }
 
 
             return new MemberDTO(existing.MemberId, existing.Name, existing.Email);

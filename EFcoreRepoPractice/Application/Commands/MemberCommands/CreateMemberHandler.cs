@@ -12,19 +12,38 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 
         public CreateMemberHandler(IUnitOfWork uow) => _uow = uow;
 
-        public async Task<MemberDTO?> CreateOneMember(CreateMemberCommand q, CancellationToken ct = default)        {
+        public async Task<MemberDTO?> CreateOneMember(CreateMemberCommand q, CancellationToken ct = default)
+        {
 
 
             var entity = _uow.GetRepository<Member>();
-            var member = new Member { Name =q.Name, Email = q.Email, Age = q.Age };
-            await entity.CreateAsync(member, ct);
-            await entity.Save();
+            var member = new Member { Name = q.Name, Email = q.Email, Age = q.Age };
 
-            return member is null ? null : new MemberDTO(member.MemberId, member.Name, member.Email);        
+            
+            await _uow.BeginTransactionAsync();
+
+            try
+            {
+
+                await entity.CreateAsync(member, ct);
+                await entity.Save();                
+                await _uow.CommitTransactionAsync();
+
+            }
+            catch
+            {
+
+                await _uow.RollbackTransactionAsync();
+                throw;
+
+            }
+
+
+            return new MemberDTO(member.MemberId, member.Name, member.Email);
 
 
         }
-         
+
 
 
     }

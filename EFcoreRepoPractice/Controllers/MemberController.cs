@@ -68,7 +68,7 @@ namespace EFcoreRepoPractice.Controllers
         //("{id:int}")
         //[HttpGet("{id:int}")]
         [HttpGet]
-        public async Task<ActionResult> Get(GetDetailQueryById request, CancellationToken ct)
+        public async Task<ActionResult<MemberDTO?>> Get(GetDetailQueryById request, CancellationToken ct)
         {
 
             //var dto = await _handler.Handler(new(id), ct);
