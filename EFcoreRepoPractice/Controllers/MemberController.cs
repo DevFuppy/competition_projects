@@ -1,5 +1,6 @@
-﻿using EFcoreRepoPractice.Application.DTos;
-using EFcoreRepoPractice.Application.Queries;
+﻿using EFcoreRepoPractice.Application.Commands.MemberCommands;
+using EFcoreRepoPractice.Application.DTos;
+using EFcoreRepoPractice.Application.Queries.MemberQueries;
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
@@ -22,17 +23,29 @@ namespace EFcoreRepoPractice.Controllers
 
 
         //private readonly IMemberRepository _memberRepository;
-        private readonly IRepository<Member> _memberRepository;
-        private readonly IUnitOfWork _uow;
-        private readonly GetMemberDetailHandler _memberHandler;
+        //private readonly IRepository<Member> _memberRepository;
+        //private readonly IUnitOfWork _uow;
+        private readonly GetMemberDetailHandler _memberGet;
+        private readonly CreateMemberHandler _memberCreate;
+        private readonly UpdateMemberHandler _memberUpdate;
+        private readonly DeleteMemberHandler _memberDelete;
 
-        public MemberController(IRepository<Member> IRepo, IUnitOfWork unow, GetMemberDetailHandler memberHandler   )
+        public MemberController(
+            IRepository<Member> IRepo,
+            //IUnitOfWork unow, 
+            GetMemberDetailHandler memberGet,
+            CreateMemberHandler memberCreate,
+            UpdateMemberHandler memberUpdate,
+            DeleteMemberHandler memberDelete
+            )
         {
-            _memberRepository = IRepo;
-            _uow = unow;
-            _memberHandler = memberHandler;
-
             //_context = context;
+            //_memberRepository = IRepo;
+            //_uow = unow;
+            _memberGet = memberGet;
+            _memberCreate = memberCreate;
+            _memberUpdate = memberUpdate;
+            _memberDelete = memberDelete;
         }
 
 
@@ -55,109 +68,113 @@ namespace EFcoreRepoPractice.Controllers
         //("{id:int}")
         //[HttpGet("{id:int}")]
         [HttpGet]
-        public async Task<ActionResult> Get(int id, CancellationToken ct)
+        public async Task<ActionResult> Get(GetDetailQueryById request, CancellationToken ct)
         {
 
             //var dto = await _handler.Handler(new(id), ct);
             //var dto = await _memberRepository.GetAsync(id, ct);
             //var entity = _uow.GetRepository<Member>();
             //var model = await entity.GetAsync(id, ct);
-            var handler = await _memberHandler.GetMemberHandler(new(id),ct);           
-            
+            var handler = await _memberGet.GetMemberHandler(request, ct);
+
 
             return handler is null ? NotFound() : Ok(handler);
         }
 
 
         [HttpGet]
-        public async Task<ActionResult> GetAll(CancellationToken ct)
+        public async Task<ActionResult<MemberDTO?>> GetAll(CancellationToken ct)
         {
 
             //var dto = await _handler.Handler(new(id), ct);
             //var members = await _memberRepository.GetAllAsync(ct);
-            var entity = _uow.GetRepository<Member>();
-            var members = await entity.GetAllAsync();
 
-            var vm = members.Select(x => new { Id = x.MemberId, x.Name, x.Email, x.Age, x.Password });
+            //var entity = _uow.GetRepository<Member>();
+            //var members = await entity.GetAllAsync();
+            //var vm = members.Select(x => new { Id = x.MemberId, x.Name, x.Email, x.Age, x.Password });
 
-            return vm is null ? NotFound() : Ok(vm);
+            var handler = await _memberGet.GetAllMemberHandler(ct);
+            return handler is null ? NotFound() : Ok(handler);
+
+
         }
 
 
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody] CreateMemberDTO dto, CancellationToken ct)
+        public async Task<ActionResult<IEnumerable<MemberDTO?>>> Create([FromBody] CreateMemberCommand cmd, CancellationToken ct)
         {
-            //CreateMemberDTO dto = new CreateMemberDTO { Name = name, Email = email, Age =age  };
-
-            var member = new Member { Name = dto.Name, Email = dto.Email, Age = dto.Age };
 
 
+            //var member = new Member { Name = dto.Name, Email = dto.Email, Age = dto.Age };
             //await _memberRepository.CreateAsync(member, ct);           
             //await _memberRepository.Save();
 
-            var entity = _uow.GetRepository<Member>();
-            await entity.CreateAsync(member, ct);
-            await entity.Save();
+            //var entity = _uow.GetRepository<Member>();
+            //await entity.CreateAsync(member, ct);
+            //await entity.Save();
 
-
-            return CreatedAtAction(nameof(Get), new { id = member.MemberId }, member);
+            var handler = await _memberCreate.CreateOneMember(cmd,ct);
+            return CreatedAtAction(nameof(Get), new { id = handler?.Id }, handler);
         }
 
         [HttpPost]
-        public async Task<ActionResult> Update([FromBody] UpdateMemberDTO dto, CancellationToken ct)
+        public async Task<ActionResult<MemberDTO?>> Update([FromBody] UpdateMemberCommand cmd, CancellationToken ct)
         {
 
 
             //var existing = await _memberRepository.GetAsync(dto.Id);
-            var entity = _uow.GetRepository<Member>();
-            var existing = await entity.GetAsync(dto.Id);
 
-            if (existing == null)
-            {
-                return NotFound();
-            }
+            //var entity = _uow.GetRepository<Member>();
+            //var existing = await entity.GetAsync(dto.Id);
 
-            //也可以這樣寫
-            //var member = new Member { MemberId = dto.Id, Name = dto.Name, Email = dto.Email, Age = dto.Age };
+            //if (existing == null)
+            //{
+            //    return NotFound();
+            //}
 
-            existing.Name = dto.Name;
+            ////也可以這樣寫
+            ////var member = new Member { MemberId = dto.Id, Name = dto.Name, Email = dto.Email, Age = dto.Age };
 
-            existing.Email = dto.Email;
+            //existing.Name = dto.Name;
 
-            existing.Age = dto.Age;
+            //existing.Email = dto.Email;
 
-            //await _memberRepository.UpdateAsync(existing, ct);
-            //await _memberRepository.Save();
-            await entity.UpdateAsync(existing);
-            await entity.Save(ct);
+            //existing.Age = dto.Age;
 
-            return Ok(existing);
+            ////await _memberRepository.UpdateAsync(existing, ct);
+            ////await _memberRepository.Save();
+            //await entity.UpdateAsync(existing);
+            //await entity.Save(ct);
+
+            var handler = await _memberUpdate.UpdateOneMember(cmd, ct);
+            return handler is null ? NotFound() : Ok(handler);
         }
 
 
 
         [HttpPost]
-        public async Task<ActionResult> Delete([FromBody] MemberDTO dto, CancellationToken ct)
+        public async Task<ActionResult> Delete([FromBody] DeleteMemberCommand dcmd, CancellationToken ct)
         {
 
-            //var existing = await _memberRepository.GetAsync(dto.Id);
-            var entity = _uow.GetRepository<Member>();
-            var existing = await entity.GetAsync(dto.Id, ct);
+            ////var existing = await _memberRepository.GetAsync(dto.Id);
+            //var entity = _uow.GetRepository<Member>();
+            //var existing = await entity.GetAsync(dto.Id, ct);
 
-            if (existing == null)
-            {
-                return NotFound();
-            }
-
-
-            //await _memberRepository.DeleteAsync(existing, ct);
-            //await _memberRepository.Save();
-            await entity.DeleteAsync(existing);
-            await entity.Save(ct);
+            //if (existing == null)
+            //{
+            //    return NotFound();
+            //}
 
 
+            ////await _memberRepository.DeleteAsync(existing, ct);
+            ////await _memberRepository.Save();
+            //await entity.DeleteAsync(existing);
+            //await entity.Save(ct);
 
-            return NoContent();
+
+            var handler = await _memberDelete.DeleteOneMember(dcmd, ct);
+            return handler is null ?  NoContent() : Ok(handler);
+            
         }
 
         /// <summary>

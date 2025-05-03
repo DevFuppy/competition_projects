@@ -3,7 +3,7 @@ using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
 
-namespace EFcoreRepoPractice.Application.Queries
+namespace EFcoreRepoPractice.Application.Queries.MemberQueries
 {
     public class GetMemberDetailHandler 
     {
@@ -11,7 +11,7 @@ namespace EFcoreRepoPractice.Application.Queries
 
         public GetMemberDetailHandler(IUnitOfWork uow) => _uow = uow;
 
-        public async Task<MemberDTO?> GetMemberHandler(GetDetailQueryById  q, CancellationToken ct = default)
+        public async Task<MemberDTO?> GetMemberHandler(GetDetailQueryById q, CancellationToken ct = default)
         {
              
 
@@ -23,6 +23,20 @@ namespace EFcoreRepoPractice.Application.Queries
 
 
         }
+
+
+        public async Task<IEnumerable<MemberDTO?>> GetAllMemberHandler(CancellationToken ct = default)
+        {
+
+
+            var entity = _uow.GetRepository<Member>();
+            var model = await entity.GetAllAsync(ct);
+
+
+            return model is null ? null :  model.Select( model=>new MemberDTO(model.MemberId, model.Name, model.Email) );
+
+        }
+
 
     }
 }

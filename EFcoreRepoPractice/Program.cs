@@ -1,5 +1,6 @@
 
-using EFcoreRepoPractice.Application.Queries;
+using EFcoreRepoPractice.Application.Commands.MemberCommands;
+using EFcoreRepoPractice.Application.Queries.MemberQueries;
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
@@ -27,10 +28,12 @@ var connectionStringAjaxClass = builder.Configuration.GetConnectionString("atHom
 builder.Services.AddDbContext<AjaxClassContext>(options => options.UseSqlServer(connectionStringAjaxClass));
 
 
-//其實是語法糖
-builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+//其實是語法糖 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<GetMemberDetailHandler>();
+builder.Services.AddScoped<CreateMemberHandler>();
+builder.Services.AddScoped<UpdateMemberHandler>();
+builder.Services.AddScoped<DeleteMemberHandler>();
 //通用版
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
