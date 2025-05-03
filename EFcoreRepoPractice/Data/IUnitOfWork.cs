@@ -11,13 +11,8 @@ namespace EFcoreRepoPractice.Data
 
         Task Save(CancellationToken ct) ;
 
+        Task ExecuteTransactionAsync(Func<Task> acuAction);
 
-        Task BeginTransactionAsync();
-
-
-        Task CommitTransactionAsync();
-
-        Task RollbackTransactionAsync();        
 
 
     }
