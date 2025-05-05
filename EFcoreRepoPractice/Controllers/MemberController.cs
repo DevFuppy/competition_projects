@@ -63,7 +63,31 @@ namespace EFcoreRepoPractice.Controllers
         //    var list = _context.Members.AsNoTracking().ToList(); // 不用 async，模仿 ADO.NET 行為
         //    return View(list);
         //}
+        #region 登入
+        [HttpGet]
+        public IActionResult Login()
+        {
 
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel lgvm)
+        {
+            
+            await _memberCreate.MemberRegistration(new(lgvm.Email, lgvm.Password));
+
+            return RedirectToAction("GetAll");
+
+        }
+
+
+
+
+        #endregion
+
+
+        #region 註冊
         [HttpGet]
         public IActionResult Register()
         {
@@ -83,8 +107,11 @@ namespace EFcoreRepoPractice.Controllers
             await _memberCreate.MemberRegistration(new(rgvm.Email,rgvm.Password));
 
             return RedirectToAction("GetAll");
-        }
 
+        }
+        #endregion
+
+        #region 查詢
         //("{id:int}")
         //[HttpGet("{id:int}")]
         [HttpGet]
@@ -113,13 +140,16 @@ namespace EFcoreRepoPractice.Controllers
             //var members = await entity.GetAllAsync();
             //var vm = members.Select(x => new { Id = x.MemberId, x.Name, x.Email, x.Age, x.Password });
 
+            ViewBag.Test = "測試用";
+
             IEnumerable<MemberDTO?>? handler = await _memberGet.GetAllMemberHandler(ct);
             return handler is null ? NotFound() : View(handler);
 
 
         }
+        #endregion
 
-
+        #region CUD範例
         [HttpPost]
         public async Task<ActionResult<MemberDTO?>> Create([FromBody] CreateMemberCommand cmd, CancellationToken ct)
         {
@@ -172,8 +202,8 @@ namespace EFcoreRepoPractice.Controllers
 
 
 
-        [HttpPost]
-        public async Task<ActionResult> Delete([FromBody] DeleteMemberCommand dcmd, CancellationToken ct)
+        [HttpGet]
+        public async Task<ActionResult<MemberDTO>> Delete(DeleteMemberCommand dcmd, CancellationToken ct)
         {
 
             ////var existing = await _memberRepository.GetAsync(dto.Id);
@@ -192,9 +222,10 @@ namespace EFcoreRepoPractice.Controllers
             //await entity.Save(ct);
 
 
-            var handler = await _memberDelete.DeleteOneMember(dcmd, ct);
-            return handler is null ? NoContent() : Ok(handler);
-
+            MemberDTO? handler = await _memberDelete.DeleteOneMember(dcmd, ct);
+            TempData["DeletedMember"] = handler?.Name+" "+handler?.Email;
+            //return handler is null ? NoContent() : Ok(handler);
+            return RedirectToAction(nameof(GetAll));
         }
 
         /// <summary>
@@ -210,7 +241,9 @@ namespace EFcoreRepoPractice.Controllers
         //    await _memberRepository.GetAsync(dto.Id) is { } existing ? NotFound() : NoContent();
 
 
-
+        #endregion
 
     }
+
+
 }

@@ -2,11 +2,22 @@
 
 @{
     ViewData["title"] = "會員列表";
+
 }
 
- 
+
+@if (TempData["DeletedMember"] != null)
+{
+    <h3 style="color:red">已刪除：@TempData["DeletedMember"]</h3>
+}
+
+
+
+@* <button id="tvb">TestViewBag</button> *@
+
+
 <div style="height:60px">
-<h2 class="mb-4" style="display:inline">會員列表</h2><a asp-action="Register" >註冊帳號</a>
+    <h2 class="mb-4" style="display:inline">會員列表</h2><a asp-action="Register">註冊帳號</a>
 </div>
 
 <table class="table table-bordered table-hover table-striped">
@@ -27,9 +38,9 @@
                 <td>@c.Email</td>
                 <td>@c.Age</td>
                 <td>
-                    <a class="btn btn-sm btn-primary" href="#">檢視</a>
-                    <a class="btn btn-sm btn-warning" href="#">編輯</a>
-                    <a class="btn btn-sm btn-danger" href="#">刪除</a>
+                    @* <a class="btn btn-sm btn-primary" href="#">檢視</a>
+                    <a class="btn btn-sm btn-warning" href="#">編輯</a> *@
+                    <a class="btn btn-sm btn-danger" id="@c.Id @c.Email @c.Name" asp-action="Delete" asp-route-id="@c.Id">刪除</a>
                 </td>
             </tr>
         }
@@ -37,6 +48,28 @@
     </tbody>
 </table>
 
+
+@section Scripts {
+
+    <script>
+        $('a.btn-danger').on('click',(e)=>{
+
+         // e.preventDefault();
+
+         let  msg = e.target.id
+
+         // console.log(msg)
+
+         alert(`已刪除${msg}`)
+
+        })
+
+
+
+    </script>
+
+
+}
 
 @* 模板 *@
 @* 

@@ -1,0 +1,44 @@
+﻿ @model LoginViewModel
+
+@{
+    ViewData["Title"] = "登入頁面";
+}
+
+
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">登入</h3>
+
+                    <form asp-action="Login" method="post">
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" type="password" class="form-control" />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>                      
+                        <button type="submit" class="btn btn-primary w-100">登入</button>
+                    </form>
+
+                </div>
+
+
+            </div>
+            <div style="height:60px">
+                <a asp-action="Register">點我註冊</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

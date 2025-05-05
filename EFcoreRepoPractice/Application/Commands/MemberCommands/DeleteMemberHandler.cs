@@ -2,7 +2,7 @@
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
-using Humanizer;
+ 
 
 namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 {

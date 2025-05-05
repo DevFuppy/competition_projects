@@ -28,6 +28,22 @@ namespace EFcoreRepoPractice.Application
         //[DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 
+    }
+
+    public class LoginViewModel
+    {
+
+        [Display(Name = "電子郵件")]
+        [Required]
+        [EmailAddress]
+        [MaxLength(100)]
+        public string Email { get; set; }
+
+
+        [Display(Name = "密碼")]
+        [Required] 
+        public string Password { get; set; }
+
 
     }
 

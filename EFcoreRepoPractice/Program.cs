@@ -60,7 +60,7 @@ app.MapStaticAssets();
 app.MapControllerRoute(
     name: "default",
     //pattern: "{controller=Home}/{action=Index}/{id?}")
-    pattern: "{controller=Member}/{action=GetAll}")
+    pattern: "{controller=Member}/{action=Login}")
     .WithStaticAssets();
 
 app.MapRazorPages()

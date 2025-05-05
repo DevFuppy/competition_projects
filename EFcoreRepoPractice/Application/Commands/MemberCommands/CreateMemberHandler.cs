@@ -2,7 +2,7 @@
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
-using Humanizer;
+ 
 
 namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 {
@@ -40,7 +40,8 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
         {
 
             var entity = _uow.GetRepository<Member>();
-            var member = new Member {  Email = q.Email, Password = q.Password };
+            var pwd =  PasswordHasher.GenerateHashPwd(q.Password);
+            var member = new Member {  Email = q.Email, Password = pwd };
 
 
             await _uow.ExecuteTransactionAsync(async () =>
@@ -49,10 +50,7 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
                 await entity.CreateAsync(member, ct);
                 await entity.Save();
 
-            });
-
-
-           
+            });           
 
 
         }
