@@ -6,7 +6,7 @@ namespace EFcoreRepoPractice.Application
     {
         public static string GenerateHashPwd(string inputPwd) => HashPassword(inputPwd,workFactor:12);
 
-        public static bool VerifyHashPwd(string oriPwd, string HashedPwd) => Verify(oriPwd, HashedPwd);
+        public static bool VerifyHashPwd(string inputPwd, string oriHashedPwd) => Verify(inputPwd, oriHashedPwd);
 
 
     }

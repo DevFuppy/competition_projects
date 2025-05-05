@@ -75,9 +75,21 @@ namespace EFcoreRepoPractice.Controllers
         public async Task<IActionResult> Login(LoginViewModel lgvm)
         {
             
-            await _memberCreate.MemberRegistration(new(lgvm.Email, lgvm.Password));
+            var result =  await _memberGet.LoginVerification(new(lgvm.Email, lgvm.Password));
 
-            return RedirectToAction("GetAll");
+            if (result is null)
+            {
+                TempData["LoginMsg"] = "帳號或密碼錯誤";
+                return View(result);
+
+            }
+            else {
+                TempData["LoginMsg"] = "登入成功";
+                return RedirectToAction("GetAll");            }
+
+
+               
+            
 
         }
 

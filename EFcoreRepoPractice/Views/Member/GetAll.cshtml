@@ -11,7 +11,11 @@
     <h3 style="color:red">已刪除：@TempData["DeletedMember"]</h3>
 }
 
+@if (TempData["LoginMsg"] is not null)
+{
 
+    <h2 style="color:lightseagreen">@TempData["LoginMsg"]</h2>
+}
 
 @* <button id="tvb">TestViewBag</button> *@
 

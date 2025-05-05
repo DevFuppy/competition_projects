@@ -4,7 +4,11 @@
     ViewData["Title"] = "登入頁面";
 }
 
+@if (TempData["LoginMsg"] is not null)
+{
 
+    <h2 style="color:red">@TempData["LoginMsg"]</h2>
+}
 
 <div class="container mt-5">
 
