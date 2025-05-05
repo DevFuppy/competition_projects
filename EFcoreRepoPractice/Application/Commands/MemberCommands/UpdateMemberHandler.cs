@@ -39,7 +39,7 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 
  
 
-            return new MemberDTO(existing.MemberId, existing.Name, existing.Email);
+            return new MemberDTO(existing.MemberId, existing.Name, existing.Email, existing.Age);
 
         }
  

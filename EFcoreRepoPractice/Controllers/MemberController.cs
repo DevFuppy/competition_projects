@@ -1,4 +1,5 @@
-﻿using EFcoreRepoPractice.Application.Commands.MemberCommands;
+﻿using EFcoreRepoPractice.Application;
+using EFcoreRepoPractice.Application.Commands.MemberCommands;
 using EFcoreRepoPractice.Application.DTos;
 using EFcoreRepoPractice.Application.Queries.MemberQueries;
 using EFcoreRepoPractice.Data;
@@ -63,7 +64,26 @@ namespace EFcoreRepoPractice.Controllers
         //    return View(list);
         //}
 
+        [HttpGet]
+        public IActionResult Register()
+        {
 
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel rgvm)
+        {
+
+            //Model.state
+            //要記得寫trycatch
+            //ViewData丟出去可顯示新增哪一筆
+            
+
+            await _memberCreate.MemberRegistration(new(rgvm.Email,rgvm.Password));
+
+            return RedirectToAction("GetAll");
+        }
 
         //("{id:int}")
         //[HttpGet("{id:int}")]
@@ -83,7 +103,7 @@ namespace EFcoreRepoPractice.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<MemberDTO?>> GetAll(CancellationToken ct)
+        public async Task<IActionResult> GetAll(CancellationToken ct)
         {
 
             //var dto = await _handler.Handler(new(id), ct);
@@ -93,15 +113,15 @@ namespace EFcoreRepoPractice.Controllers
             //var members = await entity.GetAllAsync();
             //var vm = members.Select(x => new { Id = x.MemberId, x.Name, x.Email, x.Age, x.Password });
 
-            var handler = await _memberGet.GetAllMemberHandler(ct);
-            return handler is null ? NotFound() : Ok(handler);
+            IEnumerable<MemberDTO?>? handler = await _memberGet.GetAllMemberHandler(ct);
+            return handler is null ? NotFound() : View(handler);
 
 
         }
 
 
         [HttpPost]
-        public async Task<ActionResult<IEnumerable<MemberDTO?>>> Create([FromBody] CreateMemberCommand cmd, CancellationToken ct)
+        public async Task<ActionResult<MemberDTO?>> Create([FromBody] CreateMemberCommand cmd, CancellationToken ct)
         {
 
 
@@ -113,7 +133,7 @@ namespace EFcoreRepoPractice.Controllers
             //await entity.CreateAsync(member, ct);
             //await entity.Save();
 
-            var handler = await _memberCreate.CreateOneMember(cmd,ct);
+            var handler = await _memberCreate.CreateOneMember(cmd, ct);
             return CreatedAtAction(nameof(Get), new { id = handler?.Id }, handler);
         }
 
@@ -173,8 +193,8 @@ namespace EFcoreRepoPractice.Controllers
 
 
             var handler = await _memberDelete.DeleteOneMember(dcmd, ct);
-            return handler is null ?  NoContent() : Ok(handler);
-            
+            return handler is null ? NoContent() : Ok(handler);
+
         }
 
         /// <summary>

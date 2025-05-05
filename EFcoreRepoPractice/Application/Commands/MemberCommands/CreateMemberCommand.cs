@@ -5,4 +5,6 @@
     //public record CreateMemberCommand(string Name, string Email, int Age);
     public record CreateMemberCommand(string Name, string Email, int Age);
 
+    public record RegisterMemberCommand(string Email, string Password);
+
 }

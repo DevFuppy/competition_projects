@@ -19,13 +19,13 @@ namespace EFcoreRepoPractice.Application.Queries.MemberQueries
             var model = await entity.GetAsync(q.Id, ct);
 
 
-            return model is null ? null : new MemberDTO(model.MemberId, model.Name, model.Email);        
+            return model is null ? null : new MemberDTO(model.MemberId, model.Name, model.Email, model.Age);        
 
 
         }
 
 
-        public async Task<IEnumerable<MemberDTO?>> GetAllMemberHandler(CancellationToken ct = default)
+        public async Task<IEnumerable<MemberDTO>?> GetAllMemberHandler(CancellationToken ct = default)
         {
 
 
@@ -33,7 +33,7 @@ namespace EFcoreRepoPractice.Application.Queries.MemberQueries
             var model = await entity.GetAllAsync(ct);
 
 
-            return model is null ? null :  model.Select( model=>new MemberDTO(model.MemberId, model.Name, model.Email) );
+            return model is null ? null :  model.Select( model=> new MemberDTO(model!.MemberId, model.Name, model.Email, model.Age));
 
         }
 

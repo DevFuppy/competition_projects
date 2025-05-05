@@ -1,0 +1,52 @@
+﻿ @model IEnumerable<MemberDTO?>
+
+@{
+    ViewData["title"] = "會員列表";
+}
+
+ 
+<div style="height:60px">
+<h2 class="mb-4" style="display:inline">會員列表</h2><a asp-action="Register" >註冊帳號</a>
+</div>
+
+<table class="table table-bordered table-hover table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>編號Id</th>
+            <th>姓名</th>
+            <th>Email</th>
+            <th>年齡</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Id</td>
+                <td>@c.Name</td>
+                <td>@c.Email</td>
+                <td>@c.Age</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" href="#">檢視</a>
+                    <a class="btn btn-sm btn-warning" href="#">編輯</a>
+                    <a class="btn btn-sm btn-danger" href="#">刪除</a>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+
+@* 模板 *@
+@* 
+<tr>
+    <td>2</td>
+    <td>demoUser02</td>
+    <td>2025-04-29</td>
+    <td>
+        <a class="btn btn-sm btn-primary" href="#">檢視</a>
+        <a class="btn btn-sm btn-warning" href="#">編輯</a>
+        <a class="btn btn-sm btn-danger" href="#">刪除</a>
+    </td>
+</tr> *@
