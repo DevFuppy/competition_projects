@@ -24,12 +24,13 @@ builder.Services.AddDbContext<AjaxClassContext>(options => options.UseSqlServer(
 
 
 //其實是語法糖 
-builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+//builder.Services.AddScoped<IMemberRepository, MemberRepository>();
+builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
 builder.Services.AddScoped<GetMemberDetailHandler>();
 builder.Services.AddScoped<CreateMemberHandler>();
 builder.Services.AddScoped<UpdateMemberHandler>();
 builder.Services.AddScoped<DeleteMemberHandler>();
-builder.Services.AddScoped<DeleteMemberHandler>();
+
 //通用版
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
