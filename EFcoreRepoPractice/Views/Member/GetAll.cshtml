@@ -20,6 +20,13 @@
 @* <button id="tvb">TestViewBag</button> *@
 
 
+<div>
+
+    <button id="logOut">登出</button>
+
+</div>
+
+
 <div style="height:60px">
     <h2 class="mb-4" style="display:inline">會員列表</h2><a asp-action="Register">註冊帳號</a>
 </div>
@@ -65,6 +72,23 @@
          // console.log(msg)
 
          alert(`已刪除${msg}`)
+
+        })
+
+        $('#logOut').on('click', async function(){
+
+            const response = await $.post('/Member/LogOut', (e)=>{
+            
+            alert(e.msg);
+            window.location.href = e.redirectURL;
+            
+            }).fail((err)=>{
+                        
+            console.log(err)
+            alert("登出失敗，請聯絡相關人員")
+            
+            })         
+             
 
         })
 

@@ -1,11 +1,14 @@
 
 using EFcoreRepoPractice.Application.Commands.MemberCommands;
 using EFcoreRepoPractice.Application.Queries.MemberQueries;
+using EFcoreRepoPractice.Application.Services;
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,14 +28,26 @@ builder.Services.AddDbContext<AjaxClassContext>(options => options.UseSqlServer(
 
 //其實是語法糖 
 //builder.Services.AddScoped<IMemberRepository, MemberRepository>();
-builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<GetMemberDetailHandler>();
 builder.Services.AddScoped<CreateMemberHandler>();
 builder.Services.AddScoped<UpdateMemberHandler>();
 builder.Services.AddScoped<DeleteMemberHandler>();
+builder.Services.AddScoped<LoginHandler>();
 
 //通用版
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+//驗證資訊
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
+    options =>
+    {
+        options.LoginPath = "/Member/Login";
+        options.ExpireTimeSpan = TimeSpan.FromHours(1);
+        options.SlidingExpiration = false;
+
+    });
 
 
 
@@ -52,6 +67,8 @@ else
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

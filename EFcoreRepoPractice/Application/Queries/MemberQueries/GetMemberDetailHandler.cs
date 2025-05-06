@@ -38,23 +38,5 @@ namespace EFcoreRepoPractice.Application.Queries.MemberQueries
         }
 
 
-        public async Task<MemberDTO?> LoginVerification(LoginInfo q, CancellationToken ct = default)
-        {
-
-
-
-            var entity = _uow.GetRepository<Member>();
-            var memberList = await entity.GetAllAsync(ct);
-            var member =memberList.FirstOrDefault(x => x?.Email == q.email)  ;
-
-            if (member is null || !PasswordHasher.VerifyHashPwd( q.pwd , member.Password) ) return null;
-
-
-
-            return new MemberDTO(member.MemberId, member.Name, member.Email, member.Age);
-
-        }
-
-
     }
 }

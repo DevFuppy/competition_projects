@@ -2,9 +2,13 @@
 using EFcoreRepoPractice.Application.Commands.MemberCommands;
 using EFcoreRepoPractice.Application.DTos;
 using EFcoreRepoPractice.Application.Queries.MemberQueries;
+using EFcoreRepoPractice.Application.Services;
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
@@ -30,14 +34,18 @@ namespace EFcoreRepoPractice.Controllers
         private readonly CreateMemberHandler _memberCreate;
         private readonly UpdateMemberHandler _memberUpdate;
         private readonly DeleteMemberHandler _memberDelete;
+        private readonly LoginHandler _memberLogin;
+        private readonly IAuthService _iau;
 
         public MemberController(
-            IRepository<Member> IRepo,
+            //IRepository<Member> IRepo,
+            IAuthService iau,
             //IUnitOfWork unow, 
             GetMemberDetailHandler memberGet,
             CreateMemberHandler memberCreate,
             UpdateMemberHandler memberUpdate,
-            DeleteMemberHandler memberDelete
+            DeleteMemberHandler memberDelete,
+            LoginHandler memberLogin
             )
         {
             //_context = context;
@@ -47,6 +55,8 @@ namespace EFcoreRepoPractice.Controllers
             _memberCreate = memberCreate;
             _memberUpdate = memberUpdate;
             _memberDelete = memberDelete;
+            _memberLogin = memberLogin;
+            _iau = iau;
         }
 
 
@@ -63,7 +73,12 @@ namespace EFcoreRepoPractice.Controllers
         //    var list = _context.Members.AsNoTracking().ToList(); // 不用 async，模仿 ADO.NET 行為
         //    return View(list);
         //}
-        #region 登入
+        #region 登入/登出
+
+        /// <summary>
+        /// 登入畫面
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Login()
         {
@@ -71,11 +86,15 @@ namespace EFcoreRepoPractice.Controllers
             return View();
         }
 
+        /// <summary>
+        /// 登入動作與驗證
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel lgvm)
         {
-            
-            var result =  await _memberGet.LoginVerification(new(lgvm.Email, lgvm.Password));
+
+            MemberDTO? result = await _memberLogin.LoginVerification(new(lgvm.Email, lgvm.Password));
 
             if (result is null)
             {
@@ -83,16 +102,30 @@ namespace EFcoreRepoPractice.Controllers
                 return View(result);
 
             }
-            else {
-                TempData["LoginMsg"] = "登入成功";
-                return RedirectToAction("GetAll");            }
-
-
-               
             
+                TempData["LoginMsg"] = "登入成功";
+
+                await _iau.SignInAsync(result);
+
+                return RedirectToAction("GetAll");
+           
+
+
+
 
         }
 
+        /// <summary>
+        /// 登出動作
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult> LogOut() {
+
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            return Json(new { msg="登出成功", redirectURL ="/Member/Login"});
+        }
 
 
 
@@ -114,9 +147,9 @@ namespace EFcoreRepoPractice.Controllers
             //Model.state
             //要記得寫trycatch
             //ViewData丟出去可顯示新增哪一筆
-            
 
-            await _memberCreate.MemberRegistration(new(rgvm.Email,rgvm.Password));
+
+            await _memberLogin.MemberRegistration(new(rgvm.Email, rgvm.Password));
 
             return RedirectToAction("GetAll");
 
@@ -141,6 +174,8 @@ namespace EFcoreRepoPractice.Controllers
         }
 
 
+
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll(CancellationToken ct)
         {
@@ -235,7 +270,7 @@ namespace EFcoreRepoPractice.Controllers
 
 
             MemberDTO? handler = await _memberDelete.DeleteOneMember(dcmd, ct);
-            TempData["DeletedMember"] = handler?.Name+" "+handler?.Email;
+            TempData["DeletedMember"] = handler?.Name + " " + handler?.Email;
             //return handler is null ? NoContent() : Ok(handler);
             return RedirectToAction(nameof(GetAll));
         }
