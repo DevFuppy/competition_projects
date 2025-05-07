@@ -73,6 +73,29 @@ namespace EFcoreRepoPractice.Controllers
         //    var list = _context.Members.AsNoTracking().ToList(); // 不用 async，模仿 ADO.NET 行為
         //    return View(list);
         //}
+
+        #region 忘記密碼
+
+        [HttpGet]
+        public ActionResult ForgotPassword() { 
+        
+            return View();
+        
+        }
+
+        [HttpPost]
+        public ActionResult ForgotPassword()
+        {
+
+             
+
+        }
+
+
+
+        #endregion
+
+
         #region 登入/登出
 
         /// <summary>

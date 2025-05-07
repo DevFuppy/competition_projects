@@ -26,8 +26,7 @@ namespace EFcoreRepoPractice.Infrastructure.repos
 
         public async Task<T?> GetAsync(int id, CancellationToken ct = default)
         => await _dbSet.FindAsync(new object[] { id }, ct);
-
-
+ 
 
 
         public async Task CreateAsync(T model, CancellationToken ct = default)
