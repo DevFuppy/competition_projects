@@ -2,5 +2,5 @@
 {
 
     ///<summary>變更一筆 Member </summary>
-    public record UpdateMemberCommand(int Id, string Name, string Email, int Age);
+    public record UpdateMemberCommand(int Id, string? Name = null, string? Email = null, int? Age = null, string? Password = null);
 }

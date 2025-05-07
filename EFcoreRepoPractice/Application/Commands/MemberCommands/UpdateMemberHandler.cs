@@ -12,7 +12,7 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 
         public UpdateMemberHandler(IUnitOfWork uow) => _uow = uow;
 
-        public async Task<MemberDTO?> UpdateOneMember(UpdateMemberCommand q, CancellationToken ct = default)
+        public async Task<MemberDTO?> UpdateOneMemberAsync(UpdateMemberCommand q, CancellationToken ct = default)
         {
 
 
@@ -28,6 +28,7 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
             existing.Name = q.Name;
             existing.Email = q.Email;
             existing.Age = q.Age;
+            existing.Password = q.Password;
 
 
             await _uow.ExecuteTransactionAsync(async () =>

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
+using System.Threading.Tasks;
 
 namespace EFcoreRepoPractice.Controllers
 {
@@ -84,10 +85,29 @@ namespace EFcoreRepoPractice.Controllers
         }
 
         [HttpPost]
-        public ActionResult ForgotPassword()
+        public ActionResult ForgotPasswordSendingEmail()
         {
 
-             
+
+            return View();
+
+        }
+
+        [HttpGet]
+        public ActionResult UpdatePassword()
+        {
+
+            return View();
+
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> UpdatePasswordAction(UpdatePasswordViewModel regi, CancellationToken ct)        {
+            
+            
+            await _memberUpdate.UpdateOneMemberAsync(new(Id:25 ,Password: PasswordHasher.GenerateHashPwd(regi.Password)),ct);
+            
+            return RedirectToAction("Login");
 
         }
 
@@ -266,7 +286,7 @@ namespace EFcoreRepoPractice.Controllers
             //await entity.UpdateAsync(existing);
             //await entity.Save(ct);
 
-            var handler = await _memberUpdate.UpdateOneMember(cmd, ct);
+            var handler = await _memberUpdate.UpdateOneMemberAsync(cmd, ct);
             return handler is null ? NotFound() : Ok(handler);
         }
 
