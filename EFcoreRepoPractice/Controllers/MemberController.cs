@@ -105,7 +105,7 @@ namespace EFcoreRepoPractice.Controllers
         public async Task<ActionResult> UpdatePasswordAction(UpdatePasswordViewModel regi, CancellationToken ct)        {
             
             
-            await _memberUpdate.UpdateOneMemberAsync(new(Id:25 ,Password: PasswordHasher.GenerateHashPwd(regi.Password)),ct);
+            await _memberUpdate.UpdateOneMemberAsync(new(Id:35 ,Password: PasswordHasher.GenerateHashPwd(regi.Password)),ct);
             
             return RedirectToAction("Login");
 

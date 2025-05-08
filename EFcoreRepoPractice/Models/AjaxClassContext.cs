@@ -97,7 +97,7 @@ public partial class AjaxClassContext : DbContext
 
         modelBuilder.Entity<PasswordToken>(entity =>
         {
-            entity.HasNoKey();
+            //entity.HasNoKey();
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")

@@ -2,15 +2,21 @@
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
- 
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+
 
 namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 {
     public class UpdateMemberHandler
     {
         private IUnitOfWork _uow;
+       
 
-        public UpdateMemberHandler(IUnitOfWork uow) => _uow = uow;
+        public UpdateMemberHandler(IUnitOfWork uow)
+        {
+            _uow = uow; 
+        
+        }
 
         public async Task<MemberDTO?> UpdateOneMemberAsync(UpdateMemberCommand q, CancellationToken ct = default)
         {
@@ -23,27 +29,29 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
             {
                 return null;
             }
-             
+
 
             existing.Name = q.Name;
             existing.Email = q.Email;
             existing.Age = q.Age;
             existing.Password = q.Password;
 
+            // EntityEntry<Member> entry = _context.Entry(existing);
+            //Console.WriteLine($"[Before 1 Attach] Entry State: {entry.State}");
 
             await _uow.ExecuteTransactionAsync(async () =>
             {
-                await entity.UpdateAsync(existing);
+                await entity.UpdateSelectiveAsync(existing);
                 await entity.Save(ct);
 
             });
 
- 
+
 
             return new MemberDTO(existing.MemberId, existing.Name, existing.Email, existing.Age);
 
         }
- 
+
 
 
     }

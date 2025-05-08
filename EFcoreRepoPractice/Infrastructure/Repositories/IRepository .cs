@@ -1,4 +1,5 @@
 ﻿using EFcoreRepoPractice.Models;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace EFcoreRepoPractice.Infrastructure.repos
 {
@@ -10,6 +11,7 @@ namespace EFcoreRepoPractice.Infrastructure.repos
         Task CreateAsync(T model, CancellationToken ct = default);
 
         Task UpdateAsync(T model, CancellationToken ct = default);
+        Task UpdateSelectiveAsync(T model, CancellationToken ct = default);
 
         Task DeleteAsync(T model, CancellationToken ct = default);
         Task Save(CancellationToken ct = default);

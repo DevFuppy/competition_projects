@@ -1,6 +1,8 @@
 ﻿using EFcoreRepoPractice.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Org.BouncyCastle.Asn1;
+using System;
 using System.Collections;
 
 namespace EFcoreRepoPractice.Infrastructure.repos
@@ -50,26 +52,45 @@ namespace EFcoreRepoPractice.Infrastructure.repos
 
         public Task UpdateSelectiveAsync(T model, CancellationToken ct = default)
         {
-            
-            _db.Attach(model);
 
+            var trackedEntry = _db.ChangeTracker.Entries().FirstOrDefault(e => ReferenceEquals(e.Entity, model));
+ 
+            _db.Attach(model);
+            
             //Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<T>
-            var entry = _db.Entry(model);
+            var entry = _db.Entry(model);       
+             
+
+            //取得primarykeys
+            var primaryKeys = _db.Model.FindEntityType(typeof(T))?.FindPrimaryKey()?.Properties;
+
+            List<string> keynames = primaryKeys?.Select(x => x.Name).ToList() ?? new List<string>();
+
 
             //System.Reflection.PropertyInfo
             foreach (var prop in typeof(T).GetProperties())
             {
                 var value = prop.GetValue(model);
 
+                //設定不更新的狀況
+                bool isPrimaryKey = keynames.Contains(prop.Name);
+                bool isIdLike = prop.Name.Substring(prop.Name.Length - 2).EndsWith("id", StringComparison.CurrentCultureIgnoreCase);
+                bool isCollection = typeof(IEnumerable).IsAssignableFrom(prop.PropertyType) && prop.PropertyType != typeof(string);
+
                 if (
-                    value == null 
-                    || prop.Name == "Id"
-                    || typeof(IEnumerable).IsAssignableFrom(prop.PropertyType) && prop.PropertyType!=typeof(string)
+                    value == null
+                    || isIdLike
+                    || isPrimaryKey
+                    || isCollection
                     )
+                {
+                    
+                    //entry.Property(prop.Name).IsModified = false;
                     continue;
+                }
 
                 entry.Property(prop.Name).IsModified = true;
-            }             
+            }
 
             return Task.CompletedTask;
         }
