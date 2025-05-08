@@ -63,7 +63,6 @@ namespace EFcoreRepoPractice.Infrastructure.repos
 
             //取得primarykeys
             var primaryKeys = _db.Model.FindEntityType(typeof(T))?.FindPrimaryKey()?.Properties;
-
             List<string> keynames = primaryKeys?.Select(x => x.Name).ToList() ?? new List<string>();
 
 
@@ -74,7 +73,7 @@ namespace EFcoreRepoPractice.Infrastructure.repos
 
                 //設定不更新的狀況
                 bool isPrimaryKey = keynames.Contains(prop.Name);
-                bool isIdLike = prop.Name.Substring(prop.Name.Length - 2).EndsWith("id", StringComparison.CurrentCultureIgnoreCase);
+                bool isIdLike = prop.Name.EndsWith("id", StringComparison.CurrentCultureIgnoreCase);
                 bool isCollection = typeof(IEnumerable).IsAssignableFrom(prop.PropertyType) && prop.PropertyType != typeof(string);
 
                 if (
@@ -95,14 +94,7 @@ namespace EFcoreRepoPractice.Infrastructure.repos
             return Task.CompletedTask;
         }
 
-        public Task UpdateNonNullFieldsAsync(T model, CancellationToken ct = default)
-        {
-            //_db.Update(model);
-
-            _dbSet.Entry(model).State = EntityState.Modified; //Same as update
-
-            return Task.CompletedTask;
-        }
+       
 
 
 
