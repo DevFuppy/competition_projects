@@ -10,12 +10,12 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
     public class UpdateMemberHandler
     {
         private IUnitOfWork _uow;
-       
+
 
         public UpdateMemberHandler(IUnitOfWork uow)
         {
-            _uow = uow; 
-        
+            _uow = uow;
+
         }
 
         public async Task<MemberDTO?> UpdateOneMemberAsync(UpdateMemberCommand q, CancellationToken ct = default)
@@ -36,17 +36,29 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
             existing.Age = q.Age;
             existing.Password = q.Password;
 
-            // EntityEntry<Member> entry = _context.Entry(existing);
-            //Console.WriteLine($"[Before 1 Attach] Entry State: {entry.State}");
+
+            //判斷selectiveMode 值是否正常
+            if (!Enum.IsDefined(typeof(UpdateMode), q.um))
+            {
+                throw new ArgumentOutOfRangeException(nameof(q.um) ,"輸入模式不在updateMode裡面");
+            }
+            
+            
 
             await _uow.ExecuteTransactionAsync(async () =>
             {
-                await entity.UpdateSelectiveAsync(existing);
+                if (q.um == UpdateMode.Full)
+                { 
+                    await entity.UpdateAsync(existing);
+                }
+                else if (q.um == UpdateMode.Selective)
+                { 
+                    await entity.UpdateSelectiveAsync(existing);                   
+                }
+
                 await entity.Save(ct);
 
             });
-
-
 
             return new MemberDTO(existing.MemberId, existing.Name, existing.Email, existing.Age);
 

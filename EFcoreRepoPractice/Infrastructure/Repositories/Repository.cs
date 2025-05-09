@@ -43,9 +43,9 @@ namespace EFcoreRepoPractice.Infrastructure.repos
 
         public Task UpdateAsync(T model, CancellationToken ct = default)
         {
-            //_db.Update(model);
+            _db.Update(model);
 
-            _dbSet.Entry(model).State = EntityState.Modified; //Same as update
+            //_dbSet.Entry(model).State = EntityState.Modified; //Same as update
 
             return Task.CompletedTask;
         }
@@ -53,13 +53,14 @@ namespace EFcoreRepoPractice.Infrastructure.repos
         public Task UpdateSelectiveAsync(T model, CancellationToken ct = default)
         {
 
-            var trackedEntry = _db.ChangeTracker.Entries().FirstOrDefault(e => ReferenceEquals(e.Entity, model));
- 
-            _db.Attach(model);
+            //var trackedEntry = _db.ChangeTracker.Entries().FirstOrDefault(e => ReferenceEquals(e.Entity, model));
+
+            //_db.Attach(model);
             
             //Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<T>
-            var entry = _db.Entry(model);       
-             
+            var entry = _db.Entry(model);
+
+            _db.Attach(model);
 
             //取得primarykeys
             var primaryKeys = _db.Model.FindEntityType(typeof(T))?.FindPrimaryKey()?.Properties;

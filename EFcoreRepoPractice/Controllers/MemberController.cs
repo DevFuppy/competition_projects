@@ -78,10 +78,11 @@ namespace EFcoreRepoPractice.Controllers
         #region 忘記密碼
 
         [HttpGet]
-        public ActionResult ForgotPassword() { 
-        
+        public ActionResult ForgotPassword()
+        {
+
             return View();
-        
+
         }
 
         [HttpPost]
@@ -102,11 +103,13 @@ namespace EFcoreRepoPractice.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> UpdatePasswordAction(UpdatePasswordViewModel regi, CancellationToken ct)        {
+        public async Task<ActionResult> UpdatePasswordAction(UpdatePasswordViewModel regi, CancellationToken ct)
+        {
+
             
-            
-            await _memberUpdate.UpdateOneMemberAsync(new(Id:35 ,Password: PasswordHasher.GenerateHashPwd(regi.Password)),ct);
-            
+            //await _memberUpdate.UpdateOneMemberAsync(new(Id: 38, Password: PasswordHasher.GenerateHashPwd(regi.Password), um: (UpdateMode)0), ct);
+            await _memberLogin.UpdatePasswordAsync(new(Id: 38, Password: PasswordHasher.GenerateHashPwd(regi.Password)), ct);
+
             return RedirectToAction("Login");
 
         }
@@ -137,6 +140,10 @@ namespace EFcoreRepoPractice.Controllers
         public async Task<IActionResult> Login(LoginViewModel lgvm)
         {
 
+            if (!ModelState.IsValid)
+                return View();
+
+
             MemberDTO? result = await _memberLogin.LoginVerification(new(lgvm.Email, lgvm.Password));
 
             if (result is null)
@@ -145,13 +152,13 @@ namespace EFcoreRepoPractice.Controllers
                 return View(result);
 
             }
-            
-                TempData["LoginMsg"] = "登入成功";
 
-                await _iau.SignInAsync(result);
+            TempData["LoginMsg"] = "登入成功";
 
-                return RedirectToAction("GetAll");
-           
+            await _iau.SignInAsync(result);
+
+            return RedirectToAction("GetAll");
+
 
 
 
@@ -163,11 +170,12 @@ namespace EFcoreRepoPractice.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> LogOut() {
+        public async Task<ActionResult> LogOut()
+        {
 
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            return Json(new { msg="登出成功", redirectURL ="/Member/Login"});
+            return Json(new { msg = "登出成功", redirectURL = "/Member/Login" });
         }
 
 
