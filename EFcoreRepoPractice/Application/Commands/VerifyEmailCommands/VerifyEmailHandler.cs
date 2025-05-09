@@ -2,14 +2,35 @@
 using EFcoreRepoPractice.Application.DTos;
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
+using System;
+ 
 
-namespace EFcoreRepoPractice.Application.Commands.EmailCommands
+namespace EFcoreRepoPractice.Application.Commands.VerifyEmailCommands
 {
-    public class EmailHandler
+    public class VerifyEmailHandler
     {
-        IUnitOfWork _unitOfWork;
-        EmailHandler(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
+        private IUnitOfWork _unitOfWork;
+        public VerifyEmailHandler(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
+
+
+        #region 寄驗證信
+        public async Task<dynamic> SendEmailwithTokenAsync(VerifyEmailCommand cmd,string url,CancellationToken ct=default) {
+
+            var repo = _unitOfWork.GetRepository<Member>();
+            var MachedEmail = (await repo.GetSelectivelyAsync(x => cmd.Email == x.Email, ct))?.FirstOrDefault();
+
+            if (MachedEmail is null) return null;
+
+           
+
+            EmailSender.SendMail(MachedEmail.Email, url);
+
+            return new { mail=MachedEmail.Email, url};
+        }
+        #endregion
+
 
         //public async Task<MemberDTO> VerifyTokenUpdatingPassword(UpdateMemberCommand cmd)
         //{

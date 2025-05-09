@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Org.BouncyCastle.Asn1;
 using System;
 using System.Collections;
+using System.Linq.Expressions;
 
 namespace EFcoreRepoPractice.Infrastructure.repos
 {
@@ -28,8 +29,12 @@ namespace EFcoreRepoPractice.Infrastructure.repos
 
 
 
-        public async Task<T?> GetAsync(int id, CancellationToken ct = default)
+        public async Task<T?> GetByIdAsync(int id, CancellationToken ct = default)
         => await _dbSet.FindAsync(new object[] { id }, ct);
+
+
+        public async Task<List<T>?> GetSelectivelyAsync(Expression<Func<T, bool>> columns, CancellationToken ct = default)
+        => await _dbSet.Where(columns).ToListAsync(ct);
 
 
 
@@ -56,7 +61,7 @@ namespace EFcoreRepoPractice.Infrastructure.repos
             //var trackedEntry = _db.ChangeTracker.Entries().FirstOrDefault(e => ReferenceEquals(e.Entity, model));
 
             //_db.Attach(model);
-            
+
             //Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<T>
             var entry = _db.Entry(model);
 
@@ -84,7 +89,7 @@ namespace EFcoreRepoPractice.Infrastructure.repos
                     || isCollection
                     )
                 {
-                    
+
                     //entry.Property(prop.Name).IsModified = false;
                     continue;
                 }
@@ -95,7 +100,7 @@ namespace EFcoreRepoPractice.Infrastructure.repos
             return Task.CompletedTask;
         }
 
-       
+
 
 
 

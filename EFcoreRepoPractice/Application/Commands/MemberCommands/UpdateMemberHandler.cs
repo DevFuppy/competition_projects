@@ -23,7 +23,7 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 
 
             var entity = _uow.GetRepository<Member>();
-            var existing = await entity.GetAsync(q.Id);
+            var existing = await entity.GetByIdAsync(q.Id);
 
             if (existing == null)
             {

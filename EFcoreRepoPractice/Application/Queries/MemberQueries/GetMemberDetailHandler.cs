@@ -16,7 +16,7 @@ namespace EFcoreRepoPractice.Application.Queries.MemberQueries
              
 
             var entity = _uow.GetRepository<Member>();
-            var model = await entity.GetAsync(q.Id, ct);
+            var model = await entity.GetByIdAsync(q.Id, ct);
 
 
             return model is null ? null : new MemberDTO(model.MemberId, model.Name, model.Email, model.Age);        

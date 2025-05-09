@@ -41,8 +41,8 @@ namespace EFcoreRepoPractice.Application
             string body =
                 @$" <h1>這是什麼???</h1>
                      <div>
-                         <p>屬於你的連結 >////< </p>
-                         <a href={url}></a>   </div>";
+                         <p> 點擊下方</p>
+                         <a href='{url}'> 屬於你的連結 >////<</a>   </div>";
 
 
             BuildMail(Email, subject, body);

@@ -1,5 +1,6 @@
 ﻿using EFcoreRepoPractice.Application;
 using EFcoreRepoPractice.Application.Commands.MemberCommands;
+using EFcoreRepoPractice.Application.Commands.VerifyEmailCommands;
 using EFcoreRepoPractice.Application.DTos;
 using EFcoreRepoPractice.Application.Queries.MemberQueries;
 using EFcoreRepoPractice.Application.Services;
@@ -31,12 +32,13 @@ namespace EFcoreRepoPractice.Controllers
         //private readonly IMemberRepository _memberRepository;
         //private readonly IRepository<Member> _memberRepository;
         //private readonly IUnitOfWork _uow;
+        private readonly IAuthService _iau;
         private readonly GetMemberDetailHandler _memberGet;
         private readonly CreateMemberHandler _memberCreate;
         private readonly UpdateMemberHandler _memberUpdate;
         private readonly DeleteMemberHandler _memberDelete;
         private readonly LoginHandler _memberLogin;
-        private readonly IAuthService _iau;
+        private readonly VerifyEmailHandler _emailhandler;
 
         public MemberController(
             //IRepository<Member> IRepo,
@@ -46,18 +48,20 @@ namespace EFcoreRepoPractice.Controllers
             CreateMemberHandler memberCreate,
             UpdateMemberHandler memberUpdate,
             DeleteMemberHandler memberDelete,
-            LoginHandler memberLogin
+            LoginHandler memberLogin,
+            VerifyEmailHandler emailhandler
             )
         {
             //_context = context;
             //_memberRepository = IRepo;
             //_uow = unow;
+            _iau = iau;
             _memberGet = memberGet;
             _memberCreate = memberCreate;
             _memberUpdate = memberUpdate;
             _memberDelete = memberDelete;
             _memberLogin = memberLogin;
-            _iau = iau;
+            _emailhandler = emailhandler;
         }
 
 
@@ -86,11 +90,16 @@ namespace EFcoreRepoPractice.Controllers
         }
 
         [HttpPost]
-        public ActionResult ForgotPasswordSendingEmail()
+        public async Task<ActionResult> ForgotPasswordSendingEmail(ForgetPasswordViewModel fg)
         {
 
+            string token = Guid.NewGuid().ToString();
 
-            return View();
+            string? url = Url.Action("UpdatePassword","Member",new { token },protocol:Request.Scheme);
+
+            await _emailhandler.SendEmailwithTokenAsync(new(Email: fg.Email), url ?? "");
+
+            return RedirectToAction("Login");
 
         }
 
@@ -106,7 +115,7 @@ namespace EFcoreRepoPractice.Controllers
         public async Task<ActionResult> UpdatePasswordAction(UpdatePasswordViewModel regi, CancellationToken ct)
         {
 
-            
+
             //await _memberUpdate.UpdateOneMemberAsync(new(Id: 38, Password: PasswordHasher.GenerateHashPwd(regi.Password), um: (UpdateMode)0), ct);
             await _memberLogin.UpdatePasswordAsync(new(Id: 38, Password: PasswordHasher.GenerateHashPwd(regi.Password)), ct);
 

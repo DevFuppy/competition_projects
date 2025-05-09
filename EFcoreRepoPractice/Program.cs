@@ -1,5 +1,6 @@
 
 using EFcoreRepoPractice.Application.Commands.MemberCommands;
+using EFcoreRepoPractice.Application.Commands.VerifyEmailCommands;
 using EFcoreRepoPractice.Application.Queries.MemberQueries;
 using EFcoreRepoPractice.Application.Services;
 using EFcoreRepoPractice.Data;
@@ -35,6 +36,8 @@ builder.Services.AddScoped<CreateMemberHandler>();
 builder.Services.AddScoped<UpdateMemberHandler>();
 builder.Services.AddScoped<DeleteMemberHandler>();
 builder.Services.AddScoped<LoginHandler>();
+builder.Services.AddScoped<VerifyEmailHandler>();
+
 
 //³q¥Îª©
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
