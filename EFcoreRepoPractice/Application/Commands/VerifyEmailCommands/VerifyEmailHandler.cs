@@ -1,11 +1,12 @@
 ﻿using EFcoreRepoPractice.Application.Commands.MemberCommands;
 using EFcoreRepoPractice.Application.DTos;
 using EFcoreRepoPractice.Data;
-using EFcoreRepoPractice.Models;
+using EFcoreRepoPractice.Models; 
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
 using System;
- 
+using System.Web;
+
 
 namespace EFcoreRepoPractice.Application.Commands.VerifyEmailCommands
 {
@@ -16,21 +17,41 @@ namespace EFcoreRepoPractice.Application.Commands.VerifyEmailCommands
 
 
         #region 寄驗證信
-        public async Task<dynamic> SendEmailwithTokenAsync(VerifyEmailCommand cmd,string url,CancellationToken ct=default) {
+        public async Task<dynamic> SendEmailwithTokenAsync(VerifyEmailCommand cmd, string url, CancellationToken ct = default)
+        {
 
             var repo = _unitOfWork.GetRepository<Member>();
-            var MachedEmail = (await repo.GetSelectivelyAsync(x => cmd.Email == x.Email, ct))?.FirstOrDefault();
+            var MachedMember = (await repo.GetSelectivelyAsync(x => cmd.Email == x.Email, ct))?.FirstOrDefault();
 
-            if (MachedEmail is null) return null;
+            if (MachedMember is null) return null;
 
-           
 
-            EmailSender.SendMail(MachedEmail.Email, url);
+            var repo2 = _unitOfWork.GetRepository<PasswordToken>();
 
-            return new { mail=MachedEmail.Email, url};
+            await _unitOfWork.ExecuteTransactionAsync(
+                async () =>
+                {
+                    await repo2.CreateAsync(new PasswordToken
+                    {
+                        MemberId = MachedMember.MemberId,
+                        Email = MachedMember.Email,
+                        ExpireAt = DateTime.Now.AddMinutes(20),
+                        //Token = url.Substring(url.IndexOf("=") + 1),
+                        //Token = url.Substring(url.Length-36),
+                        Token = (HttpUtility.ParseQueryString((new Uri(url)).Query))["token"],
+                        IsUsed = false
+                    });
+                    await repo2.Save();
+                }
+
+                );
+
+
+            EmailSender.SendMail(MachedMember.Email, url);
+
+            return new { mail = MachedMember.Email, url };
         }
         #endregion
-
 
         //public async Task<MemberDTO> VerifyTokenUpdatingPassword(UpdateMemberCommand cmd)
         //{

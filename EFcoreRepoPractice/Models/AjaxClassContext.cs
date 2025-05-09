@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Generic; 
 using Microsoft.EntityFrameworkCore;
-
 namespace EFcoreRepoPractice.Models;
 
 public partial class AjaxClassContext : DbContext
@@ -97,14 +96,13 @@ public partial class AjaxClassContext : DbContext
 
         modelBuilder.Entity<PasswordToken>(entity =>
         {
-            //entity.HasNoKey();
+            entity.HasKey(e => e.Id).HasName("PK_MemberId");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(256);
             entity.Property(e => e.ExpireAt).HasColumnType("datetime");
-            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.IsUsed).HasColumnName("isUsed");
             entity.Property(e => e.Token).HasMaxLength(100);
         });

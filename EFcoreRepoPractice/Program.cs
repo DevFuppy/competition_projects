@@ -24,7 +24,10 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddControllersWithViews();
 
 var connectionStringAjaxClass = builder.Configuration.GetConnectionString("ajaxClass");
-builder.Services.AddDbContext<AjaxClassContext>(options => options.UseSqlServer(connectionStringAjaxClass));
+builder.Services.AddDbContext<AjaxClassContext>(options => options.UseSqlServer(connectionStringAjaxClass)
+.EnableSensitiveDataLogging() 
+
+);
 
 
 //其實是語法糖 
