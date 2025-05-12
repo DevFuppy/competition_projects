@@ -10,6 +10,20 @@
     <h2 style="color:red">@TempData["LoginMsg"]</h2>
 }
 
+@if (TempData["UpdatePasswordMsg"] is not null)
+{
+
+    var co = TempData["UpdatePasswordMsg"] == "變更成功" ? "green" : "red";
+
+
+    <h2 style="color:@co">   @TempData["UpdatePasswordMsg"]   </h2>
+    
+}
+
+
+
+
+
 <div class="container mt-5">
 
     <div class="row justify-content-center">

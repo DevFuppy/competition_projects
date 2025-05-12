@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using static EFcoreRepoPractice.Application.Queries.EmailQueries.EmailDetailQuery;
 
 namespace EFcoreRepoPractice.Controllers
 {
@@ -113,13 +114,16 @@ namespace EFcoreRepoPractice.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> UpdatePasswordAction(UpdatePasswordViewModel regi, CancellationToken ct)
+        public async Task<ActionResult> UpdatePasswordAction(UpdatePasswordViewModel up, CancellationToken ct)
         {
 
-            await _memberLogin.UpdatePasswordAsync(new(Id: regi., Password: PasswordHasher.GenerateHashPwd(regi.Password)), ct);
-
+            dynamic result = await _emailhandler.UpdatePasswordWithTokenAsync(up, ct);
+            
+            Type type = result.GetType();
+            
+            TempData["UpdatePasswordMsg"]  = type == typeof(String)? result:"變更成功";            
+            
             return RedirectToAction("Login");
-
         }
 
 

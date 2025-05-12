@@ -47,8 +47,11 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
             try
             {
 
-                if (member.Password is null || !PasswordHasher.VerifyHashPwd(q.pwd, member.Password))
-                    return new MemberDTO(member.MemberId, member.Name, member.Email, member.Age);
+                var x = PasswordHasher.VerifyHashPwd(q.pwd, member.Password);
+
+                if (member.Password is null || !PasswordHasher.VerifyHashPwd(q.pwd, member.Password)) return null;
+
+                return new MemberDTO(member.MemberId, member.Name, member.Email, member.Age);
 
             }
             catch (SaltParseException saltwrong)
@@ -59,7 +62,7 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 
             }
 
-            return null;
+            
 
 
         }

@@ -1,9 +1,10 @@
 ﻿using EFcoreRepoPractice.Application.Commands.MemberCommands;
 using EFcoreRepoPractice.Application.DTos;
 using EFcoreRepoPractice.Data;
-using EFcoreRepoPractice.Models; 
+using EFcoreRepoPractice.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Web;
 using static EFcoreRepoPractice.Application.Queries.EmailQueries.EmailDetailQuery;
@@ -17,13 +18,13 @@ namespace EFcoreRepoPractice.Application.Commands.VerifyEmailCommands
         public VerifyEmailHandler(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
 
-         /// <summary>
-         /// 寄驗證信
-         /// </summary>
-         /// <param name="cmd"></param>
-         /// <param name="url"></param>
-         /// <param name="ct"></param>
-         /// <returns></returns>
+        /// <summary>
+        /// 寄驗證信
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="url"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         public async Task<dynamic> SendEmailwithTokenAsync(VerifyEmailCommand cmd, string url, CancellationToken ct = default)
         {
 
@@ -38,7 +39,7 @@ namespace EFcoreRepoPractice.Application.Commands.VerifyEmailCommands
             await _unitOfWork.ExecuteTransactionAsync(
                  () =>
                 {
-                     repo2.Create(new PasswordToken
+                    repo2.Create(new PasswordToken
                     {
                         MemberId = MachedMember.MemberId,
                         Email = MachedMember.Email,
@@ -48,7 +49,7 @@ namespace EFcoreRepoPractice.Application.Commands.VerifyEmailCommands
                         Token = (HttpUtility.ParseQueryString((new Uri(url)).Query))["token"],
                         IsUsed = false
                     });
-                  
+
                 }
 
                 );
@@ -66,30 +67,43 @@ namespace EFcoreRepoPractice.Application.Commands.VerifyEmailCommands
         /// <param name="q"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<MemberDTO?> UpdatePasswordWithTokenAsync(TokenDetailQuery q, CancellationToken ct = default)
+        public async Task<dynamic> UpdatePasswordWithTokenAsync(UpdatePasswordViewModel up, CancellationToken ct = default)
         {
 
-            var entity = _unitOfWork.GetRepository<PasswordToken>();
-            var existing = (await entity.GetSelectivelyAsync(x => x.Token == q.Token, ct))?.FirstOrDefault();
-
-            if (existing == null)
-            {
-                return null;
-            }
-
-            existing.IsUsed = true;
-
-            await _unitOfWork.ExecuteTransactionAsync(async () =>
-            {
-                await entity.UpdateSelectiveAsync(existing);
-                await entity.Save(ct);
-
-            });
-
-            var member = _unitOfWork.GetRepository<PasswordToken>();
+            var TokenRepo = _unitOfWork.GetRepository<PasswordToken>();
+            var MemberRepo = _unitOfWork.GetRepository<Member>();
 
 
-            //return new MemberDTO(existing.MemberId, existing.Name, existing.Email, existing.Age);
+            var TheTokenEntity = TokenRepo.GetSelectively(x => x.Token == up.Token);
+
+            if (TheTokenEntity is null) return "認證出錯";
+
+            var member = TheTokenEntity.Join(MemberRepo.GetAll(), te => te.Email, mem => mem.Email, (te, mem) => mem);
+                        
+            PasswordToken TheToken = await TheTokenEntity.FirstOrDefaultAsync();
+            
+
+            if (member is null) return "找不到使用者";
+            if (TheToken.IsUsed is true) return "連結已使用" ;
+            if (TheToken.ExpireAt <= DateTime.Now) return "連結已過期";
+
+          
+            TheToken.IsUsed = true;
+
+            var TheMember = await member.FirstAsync();
+            TheMember.Password = PasswordHasher.GenerateHashPwd(up.Password);
+
+            await _unitOfWork.ExecuteTransactionAsync(
+
+                () =>
+                {
+                    TokenRepo.UpdateSelective(TheToken);
+                    MemberRepo.UpdateSelective(TheMember);
+
+                });
+
+ 
+            return new MemberDTO(TheMember.MemberId, TheMember.Name, TheMember.Email, TheMember.Age, TheMember.Password);
 
         }
 
