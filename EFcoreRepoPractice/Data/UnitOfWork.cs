@@ -26,13 +26,13 @@ namespace EFcoreRepoPractice.Data
 
         //IRepository<T> b = _provider.GetRequiredService<IRepository<T>>();
 
-        public async Task Save(CancellationToken ct) =>
+        public async Task Save(CancellationToken ct =default) =>
 
             await _context.SaveChangesAsync(ct);
  
 
 
-        public async Task ExecuteTransactionAsync(Func<Task> acuAction)
+        public async Task ExecuteTransactionAsync(Action acuAction)
         {
 
             {
@@ -41,7 +41,8 @@ namespace EFcoreRepoPractice.Data
                 try
                 {
 
-                    await acuAction();
+                    acuAction();
+                    await Save();
                     await _transaction.CommitAsync();
 
                 }

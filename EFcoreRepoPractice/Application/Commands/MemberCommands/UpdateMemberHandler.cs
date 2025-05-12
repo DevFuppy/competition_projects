@@ -2,6 +2,7 @@
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 
@@ -23,7 +24,7 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 
 
             var entity = _uow.GetRepository<Member>();
-            var existing = await entity.GetByIdAsync(q.Id);
+            var existing = await entity.GetSelectively(x => q.Id == x.MemberId)?.FirstOrDefaultAsync();
 
             if (existing == null)
             {
@@ -45,18 +46,17 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
             
             
 
-            await _uow.ExecuteTransactionAsync(async () =>
+            await _uow.ExecuteTransactionAsync(  () =>
             {
                 if (q.um == UpdateMode.Full)
                 { 
-                    await entity.UpdateAsync(existing);
+                    entity.Update(existing);
                 }
                 else if (q.um == UpdateMode.Selective)
                 { 
-                    await entity.UpdateSelectiveAsync(existing);                   
+                    entity.UpdateSelective(existing);                   
                 }
-
-                await entity.Save(ct);
+                                 
 
             });
 

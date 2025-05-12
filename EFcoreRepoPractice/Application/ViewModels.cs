@@ -75,6 +75,9 @@ namespace EFcoreRepoPractice.Application
         //[DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 
+        [Required(ErrorMessage ="請至登入頁點選忘記密碼")]
+        public string Token { get; set; }
+
 
     }
 

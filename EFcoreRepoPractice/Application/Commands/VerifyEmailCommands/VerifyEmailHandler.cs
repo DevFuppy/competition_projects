@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
 using System;
 using System.Web;
+using static EFcoreRepoPractice.Application.Queries.EmailQueries.EmailDetailQuery;
 
 
 namespace EFcoreRepoPractice.Application.Commands.VerifyEmailCommands
@@ -16,12 +17,18 @@ namespace EFcoreRepoPractice.Application.Commands.VerifyEmailCommands
         public VerifyEmailHandler(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
 
-        #region 寄驗證信
+         /// <summary>
+         /// 寄驗證信
+         /// </summary>
+         /// <param name="cmd"></param>
+         /// <param name="url"></param>
+         /// <param name="ct"></param>
+         /// <returns></returns>
         public async Task<dynamic> SendEmailwithTokenAsync(VerifyEmailCommand cmd, string url, CancellationToken ct = default)
         {
 
             var repo = _unitOfWork.GetRepository<Member>();
-            var MachedMember = (await repo.GetSelectivelyAsync(x => cmd.Email == x.Email, ct))?.FirstOrDefault();
+            var MachedMember = (repo.GetSelectively(x => cmd.Email == x.Email))?.FirstOrDefault();
 
             if (MachedMember is null) return null;
 
@@ -29,9 +36,9 @@ namespace EFcoreRepoPractice.Application.Commands.VerifyEmailCommands
             var repo2 = _unitOfWork.GetRepository<PasswordToken>();
 
             await _unitOfWork.ExecuteTransactionAsync(
-                async () =>
+                 () =>
                 {
-                    await repo2.CreateAsync(new PasswordToken
+                     repo2.Create(new PasswordToken
                     {
                         MemberId = MachedMember.MemberId,
                         Email = MachedMember.Email,
@@ -41,48 +48,50 @@ namespace EFcoreRepoPractice.Application.Commands.VerifyEmailCommands
                         Token = (HttpUtility.ParseQueryString((new Uri(url)).Query))["token"],
                         IsUsed = false
                     });
-                    await repo2.Save();
+                  
                 }
 
                 );
 
 
-            EmailSender.SendMail(MachedMember.Email, url);
+            await EmailSender.SendMail(MachedMember.Email, url);
 
             return new { mail = MachedMember.Email, url };
         }
-        #endregion
 
-        //public async Task<MemberDTO> VerifyTokenUpdatingPassword(UpdateMemberCommand cmd)
-        //{
 
-        //    //先假設token是對的           
+        /// <summary>
+        /// 更新Token使用狀況
+        /// </summary>
+        /// <param name="q"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<MemberDTO?> UpdatePasswordWithTokenAsync(TokenDetailQuery q, CancellationToken ct = default)
+        {
 
-        //    //var newTokenEntity = new PasswordToken
-        //    //{
-        //    //    Email = fpm.Email,
-        //    //    Token = new Guid().ToString(),
-        //    //    ExpireAt = DateTime.Now.AddMinutes(30),
-        //    //};
+            var entity = _unitOfWork.GetRepository<PasswordToken>();
+            var existing = (await entity.GetSelectivelyAsync(x => x.Token == q.Token, ct))?.FirstOrDefault();
 
-        //    var member = new Member
-        //    {
-        //        Password = cmd.Password,
-        //    };
+            if (existing == null)
+            {
+                return null;
+            }
 
-        //    var repo = _unitOfWork.GetRepository<Member>();            ;
+            existing.IsUsed = true;
 
-        //    await _unitOfWork.ExecuteTransactionAsync(async () =>
-        //    {
+            await _unitOfWork.ExecuteTransactionAsync(async () =>
+            {
+                await entity.UpdateSelectiveAsync(existing);
+                await entity.Save(ct);
 
-        //        await repo.UpdateAsync(member);
-        //        await repo.Save();
+            });
 
-        //    });
+            var member = _unitOfWork.GetRepository<PasswordToken>();
 
-        //    return
 
-        //}
+            //return new MemberDTO(existing.MemberId, existing.Name, existing.Email, existing.Age);
+
+        }
 
     }
 }

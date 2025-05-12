@@ -1,8 +1,10 @@
-﻿using EFcoreRepoPractice.Application.DTos;
+﻿using BCrypt.Net;
+using EFcoreRepoPractice.Application.DTos;
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
- 
+using Microsoft.EntityFrameworkCore;
+
 
 namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 {
@@ -11,23 +13,23 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
         private IUnitOfWork _uow;
 
         public LoginHandler(IUnitOfWork uow) => _uow = uow;
-        
 
-        public async Task  MemberRegistration(RegisterMemberCommand q, CancellationToken ct = default)
+
+        public async Task MemberRegistration(RegisterMemberCommand q, CancellationToken ct = default)
         {
 
             var entity = _uow.GetRepository<Member>();
-            var pwd =  PasswordHasher.GenerateHashPwd(q.Password);
-            var member = new Member {  Email = q.Email, Password = pwd };
+            var pwd = PasswordHasher.GenerateHashPwd(q.Password);
+            var member = new Member { Email = q.Email, Password = pwd };
 
 
-            await _uow.ExecuteTransactionAsync(async () =>
+            await _uow.ExecuteTransactionAsync(() =>
             {
 
-                await entity.CreateAsync(member, ct);
-                await entity.Save();
+                entity.Create(member);
 
-            });           
+
+            });
 
 
         }
@@ -36,39 +38,29 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
         public async Task<MemberDTO?> LoginVerification(LoginInfo q, CancellationToken ct = default)
         {
             var entity = _uow.GetRepository<Member>();
-            var memberList = await entity.GetAllAsync(ct);
-            var member = memberList.FirstOrDefault(x => x?.Email == q.email);
+            var memberList = entity.GetAll();
+            var member = await memberList.FirstOrDefaultAsync(x => x.Email == q.email);
 
-            if (member is null || member.Password is null|| !PasswordHasher.VerifyHashPwd(q.pwd, member.Password)) return null;
+            if (member is null) return null;
 
-            return new MemberDTO(member.MemberId, member.Name, member.Email, member.Age);
 
-        }
-
-        public async Task<MemberDTO?> UpdatePasswordAsync(UpdateMemberCommand q, CancellationToken ct = default)
-        {
-
-            var entity = _uow.GetRepository<Member>();
-            var existing = await entity.GetByIdAsync(q.Id);
-
-            if (existing == null)
+            try
             {
-                return null;
+
+                if (member.Password is null || !PasswordHasher.VerifyHashPwd(q.pwd, member.Password))
+                    return new MemberDTO(member.MemberId, member.Name, member.Email, member.Age);
+
+            }
+            catch (SaltParseException saltwrong)
+            {
+
+
+                throw new SaltParseException("資料庫密碼無加鹽", saltwrong);
+
             }
 
-            existing.Name = q.Name;
-            existing.Email = q.Email;
-            existing.Age = q.Age;
-            existing.Password = q.Password;
-            
-            await _uow.ExecuteTransactionAsync(async () =>
-            {
-                await entity.UpdateSelectiveAsync(existing);
-                await entity.Save(ct);
+            return null;
 
-            });
-
-            return new MemberDTO(existing.MemberId, existing.Name, existing.Email, existing.Age);
 
         }
 

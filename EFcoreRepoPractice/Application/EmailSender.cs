@@ -8,7 +8,7 @@ namespace EFcoreRepoPractice.Application
     public static class EmailSender
     {
 
-        public static void BuildMail(string Email, string subject, string bodyHtml)
+        public static async Task BuildMail(string Email, string subject, string bodyHtml)
         {
             var mail = new MimeMessage();
 
@@ -25,7 +25,7 @@ namespace EFcoreRepoPractice.Application
 
                 smtp.Connect("smtp.gmail.com",587,SecureSocketOptions.StartTls);
                 smtp.Authenticate("iiispan.jojo@gmail.com", "smicaztagudgpvwk");
-                smtp.Send(mail);
+                await smtp.SendAsync(mail);
                 smtp.Dispose();
                  
             }
@@ -34,7 +34,7 @@ namespace EFcoreRepoPractice.Application
 
 
 
-        public static void SendMail(string Email, string url)
+        public static async Task SendMail(string Email, string url)
         {
              
             string subject = "測試信來瞜~";
@@ -45,7 +45,7 @@ namespace EFcoreRepoPractice.Application
                          <a href='{url}'> 屬於你的連結 >////<</a>   </div>";
 
 
-            BuildMail(Email, subject, body);
+            await BuildMail(Email, subject, body);
         
         }
 

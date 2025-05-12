@@ -24,38 +24,37 @@ namespace EFcoreRepoPractice.Infrastructure.repos
 
 
 
-        public async Task<IEnumerable<T?>> GetAllAsync(CancellationToken ct = default)
-       => await _dbSet.AsNoTracking().ToListAsync();
+        public IQueryable<T> GetAll()
+       => _dbSet;
 
 
 
-        public async Task<T?> GetByIdAsync(int id, CancellationToken ct = default)
-        => await _dbSet.FindAsync(new object[] { id }, ct);
+        //public IQueryable<T>? GetById(int id)
+        //=>  _dbSet.Where(x=> x.id ==  id );
 
 
-        public async Task<List<T>?> GetSelectivelyAsync(Expression<Func<T, bool>> columns, CancellationToken ct = default)
-        => await _dbSet.Where(columns).ToListAsync(ct);
+        public IQueryable<T>? GetSelectively(Expression<Func<T, bool>> columns)
+        => _dbSet.Where(columns);
 
 
 
-        public async Task CreateAsync(T model, CancellationToken ct = default)
+        public void Create(T model)
         {
-            await _dbSet.AddAsync(model);
-
+            _dbSet.Add(model);
 
         }
 
 
-        public Task UpdateAsync(T model, CancellationToken ct = default)
+        public void Update(T model)
         {
             _db.Update(model);
 
             //_dbSet.Entry(model).State = EntityState.Modified; //Same as update
 
-            return Task.CompletedTask;
+ 
         }
 
-        public Task UpdateSelectiveAsync(T model, CancellationToken ct = default)
+        public void UpdateSelective(T model)
         {
 
             //var trackedEntry = _db.ChangeTracker.Entries().FirstOrDefault(e => ReferenceEquals(e.Entity, model));
@@ -97,24 +96,22 @@ namespace EFcoreRepoPractice.Infrastructure.repos
                 entry.Property(prop.Name).IsModified = true;
             }
 
-            return Task.CompletedTask;
+           
         }
 
 
 
-
-
-        public Task DeleteAsync(T model, CancellationToken ct = default)
+        public void Delete(T model)
         {
             _db.Remove(model);
 
-            return Task.CompletedTask;
+        
         }
 
-        public async Task Save(CancellationToken ct = default)
-        {
-            await _db.SaveChangesAsync(ct);
-        }
+        //public async Task Save(CancellationToken ct = default)
+        //{
+        //    await _db.SaveChangesAsync(ct);
+        //}
 
 
     }

@@ -6,16 +6,16 @@ namespace EFcoreRepoPractice.Infrastructure.repos
 {
     public interface IRepository<T> where T : class
     {
-        Task<IEnumerable<T?>> GetAllAsync(CancellationToken ct = default);
-        Task<T?> GetByIdAsync(int id, CancellationToken ct = default);
+        IQueryable<T> GetAll();         
 
-        Task<List<T>?> GetSelectivelyAsync(Expression<Func<T, bool>> columns, CancellationToken ct = default);
-        Task CreateAsync(T model, CancellationToken ct = default);
+        IQueryable<T>? GetSelectively(Expression<Func<T, bool>> columns);
 
-        Task UpdateAsync(T model, CancellationToken ct = default);
-        Task UpdateSelectiveAsync(T model, CancellationToken ct = default);
+        void Create(T model);
 
-        Task DeleteAsync(T model, CancellationToken ct = default);
-        Task Save(CancellationToken ct = default);
+        void Update(T model);
+        void UpdateSelective(T model);
+
+        void Delete(T model);
+        //Task Save(CancellationToken ct = default);
     }
 }

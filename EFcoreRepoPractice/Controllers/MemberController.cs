@@ -1,4 +1,5 @@
-﻿using EFcoreRepoPractice.Application;
+﻿using BCrypt.Net;
+using EFcoreRepoPractice.Application;
 using EFcoreRepoPractice.Application.Commands.MemberCommands;
 using EFcoreRepoPractice.Application.Commands.VerifyEmailCommands;
 using EFcoreRepoPractice.Application.DTos;
@@ -95,7 +96,7 @@ namespace EFcoreRepoPractice.Controllers
 
             string token = Guid.NewGuid().ToString();
 
-            string? url = Url.Action("UpdatePassword","Member",new { token },protocol:Request.Scheme);
+            string? url = Url.Action("UpdatePassword", "Member", new { token }, protocol: Request.Scheme);
 
             await _emailhandler.SendEmailwithTokenAsync(new(Email: fg.Email), url ?? "");
 
@@ -104,9 +105,9 @@ namespace EFcoreRepoPractice.Controllers
         }
 
         [HttpGet]
-        public ActionResult UpdatePassword()
+        public ActionResult UpdatePassword(string token)
         {
-
+            ViewBag.Token = token;
             return View();
 
         }
@@ -115,9 +116,7 @@ namespace EFcoreRepoPractice.Controllers
         public async Task<ActionResult> UpdatePasswordAction(UpdatePasswordViewModel regi, CancellationToken ct)
         {
 
-
-            //await _memberUpdate.UpdateOneMemberAsync(new(Id: 38, Password: PasswordHasher.GenerateHashPwd(regi.Password), um: (UpdateMode)0), ct);
-            await _memberLogin.UpdatePasswordAsync(new(Id: 38, Password: PasswordHasher.GenerateHashPwd(regi.Password)), ct);
+            await _memberLogin.UpdatePasswordAsync(new(Id: regi., Password: PasswordHasher.GenerateHashPwd(regi.Password)), ct);
 
             return RedirectToAction("Login");
 
@@ -152,24 +151,41 @@ namespace EFcoreRepoPractice.Controllers
             if (!ModelState.IsValid)
                 return View();
 
-
-            MemberDTO? result = await _memberLogin.LoginVerification(new(lgvm.Email, lgvm.Password));
-
-            if (result is null)
+            try
             {
-                TempData["LoginMsg"] = "帳號或密碼錯誤";
-                return View(result);
+
+                MemberDTO? result = await _memberLogin.LoginVerification(new(lgvm.Email, lgvm.Password));
+
+
+                if (result is null)
+                {
+                    TempData["LoginMsg"] = "帳號或密碼錯誤";
+                    return View(result);
+
+                }
+
+
+                TempData["LoginMsg"] = "登入成功";
+
+                await _iau.SignInAsync(result);
+                return RedirectToAction("GetAll");
+            }
+            catch (SaltParseException Salt)
+            {
+
+                TempData["LoginMsg"] = "資料庫層級錯誤: "+ Salt.Message;
+                return RedirectToAction("Login");
+
+            }
+            catch (Exception ex)
+            {
+
+                TempData["LoginMsg"] = "系統錯誤，請聯絡管理員，錯誤類型: " + ex.Message;
+                return RedirectToAction("Login");
 
             }
 
-            TempData["LoginMsg"] = "登入成功";
-
-            await _iau.SignInAsync(result);
-
-            return RedirectToAction("GetAll");
-
-
-
+            
 
 
         }

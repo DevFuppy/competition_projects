@@ -2,7 +2,7 @@
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
- 
+
 
 namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 {
@@ -20,21 +20,13 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
             var member = new Member { Name = q.Name, Email = q.Email, Age = q.Age };
 
 
-            await _uow.ExecuteTransactionAsync(async () =>
-            {
-
-                await entity.CreateAsync(member, ct);
-                await entity.Save();
-
-            });
-
-
+            await _uow.ExecuteTransactionAsync(() => entity.Create(member));
 
 
             return new MemberDTO(member.MemberId, member.Name, member.Email, member.Age);
 
 
-        }       
+        }
 
 
 

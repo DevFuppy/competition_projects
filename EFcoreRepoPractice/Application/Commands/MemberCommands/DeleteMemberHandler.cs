@@ -2,7 +2,8 @@
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
- 
+using Microsoft.EntityFrameworkCore;
+
 
 namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 {
@@ -12,12 +13,12 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 
         public DeleteMemberHandler(IUnitOfWork uow) => _uow = uow;
 
-        public async Task<MemberDTO?> DeleteOneMember(DeleteMemberCommand  q, CancellationToken ct = default)
+        public async Task<MemberDTO?> DeleteOneMember(DeleteMemberCommand q, CancellationToken ct = default)
         {
 
-             
+
             var entity = _uow.GetRepository<Member>();
-            var existing = await entity.GetByIdAsync(q.Id, ct);
+            var existing = await entity.GetSelectively(x => x.MemberId ==q.Id)?.FirstOrDefaultAsync();
 
             if (existing == null)
             {
@@ -25,21 +26,19 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
             }
 
 
-            await _uow.ExecuteTransactionAsync(async () =>
+            await _uow.ExecuteTransactionAsync(() =>
             {
-
-                await entity.DeleteAsync(existing);
-                await entity.Save(ct);
+                entity.Delete(existing);
 
             });
 
 
-                                                             /*也可以在DTO就?設定nullable*/
-            return new MemberDTO(existing.MemberId, existing.Name, existing.Email?? "", existing.Age );
+            /*也可以在DTO就?設定nullable*/
+            return new MemberDTO(existing.MemberId, existing.Name, existing.Email ?? "", existing.Age);
         }
 
 
-       
+
 
 
     }

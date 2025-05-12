@@ -2,6 +2,7 @@
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace EFcoreRepoPractice.Application.Queries.MemberQueries
 {
@@ -16,7 +17,7 @@ namespace EFcoreRepoPractice.Application.Queries.MemberQueries
              
 
             var entity = _uow.GetRepository<Member>();
-            var model = await entity.GetByIdAsync(q.Id, ct);
+            var model = await entity.GetSelectively( x=>  x.MemberId == q.Id)?.FirstOrDefaultAsync(ct);
 
 
             return model is null ? null : new MemberDTO(model.MemberId, model.Name, model.Email, model.Age);        
@@ -30,7 +31,7 @@ namespace EFcoreRepoPractice.Application.Queries.MemberQueries
 
 
             var entity = _uow.GetRepository<Member>();
-            var model = await entity.GetAllAsync(ct);
+            var model = await entity.GetAll().ToListAsync();
 
 
             return model is null ? null :  model.Select( model=> new MemberDTO(model!.MemberId, model.Name, model.Email, model.Age));
