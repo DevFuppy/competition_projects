@@ -13,10 +13,10 @@
 @if (TempData["UpdatePasswordMsg"] is not null)
 {
 
-    string co = TempData["UpdatePasswordMsg"].ToString() == "變更成功" ? "green" : "red";   
+    string co = TempData["UpdatePasswordMsg"].ToString() == "變更成功" ? "green" : "red";
 
     <h2 style="color:@co">   @TempData["UpdatePasswordMsg"]   </h2>
-    
+
 }
 
 
@@ -43,7 +43,7 @@
                             <label asp-for="Password" class="form-label"></label>
                             <input asp-for="Password" type="password" class="form-control" />
                             <span asp-validation-for="Password" class="text-danger small"></span>
-                        </div>                      
+                        </div>
                         <button type="submit" class="btn btn-primary w-100">登入</button>
                     </form>
 
@@ -58,6 +58,158 @@
     </div>
 </div>
 
+
+<div class="container border border-3 border-danger-subtle rounded-2 ">
+
+    <div class="row  ">
+        <h4>FormAjax測試</h4>
+        <div class="col-12 d-flex gap-1 justify-content-start ">
+            <input type="text" style="width:150px" class="form-control border-dark" name="name" value="" />
+            <input type="text" style="width:150px" class="form-control border-dark" name="name" value="" />
+            <input type="text" style="width:150px" class="form-control border-dark" name="name" value="" />
+            <input type="text" style="width:150px" class="form-control border-dark" name="name" value="" />
+            <input type="text" style="width:150px" class="form-control border-dark" name="name" value="" />
+        </div>
+
+    </div>
+    <div class="row justify-content-start">
+        <h4>非FormAjax測試</h4>
+        <div class="col-2 d-flex ">
+            <button class="btn btn-primary" id="jQueryPost">jQueryPost</button>
+            <button class="btn btn-outline-info" id="jQueryGet">jQueryGet</button>
+            <button class="btn btn-secondary" id="jQueryAjaxPost">jQueryAjaxPost</button>
+            <button class="btn btn-secondary" id="jQueryAjaxGet">jQueryAjaxGet</button>
+            <button class="btn btn-outline-dark" id="jsAsyncFetchGet" onclick="notFormGet()">jsAsyncFetchGet</button>
+            <button class="btn btn-outline-dark" id="jsAsyncFetchPost" onclick="notFormPost()">jsAsyncFetchPostPromise</button>          
+        </div>
+
+    </div>
+
+</div>
+
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        let testObj = {Name:'jo', Age:15, Email:'63333'};
+        let testOutObj;
+        let EmailTail = "test@@mail234.com"
+        let Email = "test@@mail234.com"
+
+        $('#jQueryPost').on('click', ()=>{
+
+          $.post(
+             '/Member/JQPost',testObj, (e)=>{
+                 alert("成功");
+                 testOutObj=e ;
+                 console.log(testOutObj)
+             }).fail(()=>{alert("失敗")})
+        })
+
+        $('#jQueryGet').on('click',()=>{
+
+            let urlFirst = `@Url.Content("~/Member/JQGet?Email=")${EmailTail}`
+            let urlOri = "@Url.Content("~/Member/JQGet")"
+
+            $.get(urlFirst).done((e)=>{ alert("成功"); console.log(e)  }).fail(()=>{ alert("大失敗") })
+            $.get(urlOri, {Email:Email},(e)=>
+            {
+                alert("成功2"); console.log(e)
+            })
+            .done((e)=>{
+                alert("成功2-2"); console.log(e)
+            })
+            .fail(()=>{ alert("大失敗2") })
+
+        })
+
+        $('#jQueryAjaxPost').on('click',()=>{
+
+        $.ajax({
+            url:`@Url.Content("~/Member/JQPost")`,
+            method:'post',
+            data: testOutObj,
+           // contentType:'application/json',
+            success:(e)=>{ alert("成功"); console.log(e)},
+            error: ()=>{alert("ajaxpost失敗") }
+        })
+
+        })
+
+        $('#jQueryAjaxGet').on('click',()=>{
+            $.ajax({
+            url:'@Url.Content("~/Member/JQGet")',
+            data:{Email:testObj.Email}
+            }).done((e)=>{console.log(e)}).fail(()=>{console.log('失敗')});
+          })
+
+        async function notFormGet(){
+
+              let query = new URLSearchParams(testObj);
+
+              try{
+              let result = await fetch( `@Url.Content("~/Member/JQGet?")${query}`)
+
+              // console.log(await result.json())
+              console.log(await result.text())
+              }
+              catch(e){
+
+                  console.log("失敗")
+                  console.log(e)
+              }
+
+          }
+
+       let resultA
+
+        function notFormPost(){
+
+           let data = new URLSearchParams(testObj)
+          
+            
+          fetch( "@Url.Content("~/Member/JQPost")", {
+           
+               method:'Post',
+               headers:{                   
+                    
+                   // "Content-Type":"application/x-www-form-urlencoded" //Use [FromForm] or default at backend
+                    "Content-Type":"application/json"
+               },
+                  // body:data
+                 body:JSON.stringify(testObj)
+             }).then((s)=>{
+
+                 return s.json()
+              
+             }).then((s)=>{
+
+                   resultA = s;
+
+                 console.log(s)
+             })
+             
+             .catch((e)=>{
+
+                 alert("失敗")
+                 console.log(e)
+             
+             })
+
+            
+
+             
+
+            
+ 
+            
+            
+       }
+
+
+    </script>
+
+
 }

@@ -66,8 +66,6 @@ namespace EFcoreRepoPractice.Controllers
             _emailhandler = emailhandler;
         }
 
-
-
         ////[HttpPost]
 
         //public IActionResult Index()
@@ -369,6 +367,51 @@ namespace EFcoreRepoPractice.Controllers
         #endregion
 
 
+
+        public record TestAjaxModel(int? Id=null, string? Email = null, string? Name = null, int? Age=null, bool? Fact = true);
+
+        // public class TestAjaxModel { 
+
+        //public  int Age { get; set; }
+
+        // }
+
+
+
+        #region Ajax測試區
+
+
+        [HttpPost]
+        public IActionResult JQPost([FromBody]TestAjaxModel tam) {
+
+            var newTam = tam with { Age=tam.Age+20 };
+
+            return Json(newTam);
+        }
+
+
+        [HttpGet]
+        public IActionResult JQGet(string Email)
+        {
+
+            Email += "加了料";
+
+            return Ok(Email);
+        }
+
+
+        [HttpPost]
+        public IActionResult JQAjaxPost(TestAjaxModel tam)
+        {
+
+            var newTam = tam with { Age = tam.Age + 20 };
+
+            return Json(newTam);
+        }
+
+
+
+        #endregion
     }
 
 
