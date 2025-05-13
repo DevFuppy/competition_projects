@@ -13,12 +13,13 @@
 @if (TempData["UpdatePasswordMsg"] is not null)
 {
 
-    var co = TempData["UpdatePasswordMsg"] == "變更成功" ? "green" : "red";
-
+    string co = TempData["UpdatePasswordMsg"].ToString() == "變更成功" ? "green" : "red";   
 
     <h2 style="color:@co">   @TempData["UpdatePasswordMsg"]   </h2>
     
 }
+
+
 
 
 
