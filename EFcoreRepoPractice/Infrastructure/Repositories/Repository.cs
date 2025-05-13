@@ -16,16 +16,13 @@ namespace EFcoreRepoPractice.Infrastructure.repos
 
         public Repository(AjaxClassContext db)
         {
-
             _db = db;
             _dbSet = _db.Set<T>();
-
         }
 
 
 
-        public IQueryable<T> GetAll()
-       => _dbSet;
+        public IQueryable<T> GetAll() => _dbSet;
 
 
 
@@ -38,21 +35,14 @@ namespace EFcoreRepoPractice.Infrastructure.repos
 
 
 
-        public void Create(T model)
-        {
-            _dbSet.Add(model);
-
-        }
-
-
-        public void Update(T model)
-        {
-            _db.Update(model);
-
-            //_dbSet.Entry(model).State = EntityState.Modified; //Same as update
-
+        public void Create(T model) => _dbSet.Add(model);
  
-        }
+
+
+        public void Update(T model) => _db.Update(model);
+        //_dbSet.Entry(model).State = EntityState.Modified; //Same as update 
+
+
 
         public void UpdateSelective(T model)
         {
@@ -88,7 +78,6 @@ namespace EFcoreRepoPractice.Infrastructure.repos
                     || isCollection
                     )
                 {
-
                     //entry.Property(prop.Name).IsModified = false;
                     continue;
                 }
@@ -101,12 +90,8 @@ namespace EFcoreRepoPractice.Infrastructure.repos
 
 
 
-        public void Delete(T model)
-        {
-            _db.Remove(model);
-
-        
-        }
+        public void Delete(T model) => _db.Remove(model); 
+         
 
         //public async Task Save(CancellationToken ct = default)
         //{

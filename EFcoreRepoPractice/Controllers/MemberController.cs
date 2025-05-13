@@ -130,7 +130,6 @@ namespace EFcoreRepoPractice.Controllers
 
         #endregion
 
-
         #region 登入/登出
 
         /// <summary>
@@ -210,7 +209,6 @@ namespace EFcoreRepoPractice.Controllers
 
 
         #endregion
-
 
         #region 註冊
         [HttpGet]
@@ -369,6 +367,7 @@ namespace EFcoreRepoPractice.Controllers
 
 
         #endregion
+
 
     }
 
