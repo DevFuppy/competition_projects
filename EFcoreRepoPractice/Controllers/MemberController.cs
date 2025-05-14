@@ -382,7 +382,7 @@ namespace EFcoreRepoPractice.Controllers
 
 
         [HttpPost]
-        public IActionResult JQPost([FromBody]TestAjaxModel tam) {
+        public IActionResult AjaxFromBody([FromBody]TestAjaxModel tam) {
 
             var newTam = tam with { Age=tam.Age+20 };
 
@@ -391,7 +391,7 @@ namespace EFcoreRepoPractice.Controllers
 
 
         [HttpGet]
-        public IActionResult JQGet(string Email)
+        public IActionResult AjaxGet(string Email)
         {
 
             Email += "加了料";
@@ -401,7 +401,7 @@ namespace EFcoreRepoPractice.Controllers
 
 
         [HttpPost]
-        public IActionResult JQAjaxPost(TestAjaxModel tam)
+        public IActionResult AjaxPostFromForm(TestAjaxModel tam)
         {
 
             var newTam = tam with { Age = tam.Age + 20 };
