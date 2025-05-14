@@ -61,25 +61,33 @@
 
 <div class="container border border-3 border-danger-subtle rounded-2 ">
 
-     <div class="row  ">  
-         <h4>FormAjax測試</h4>  
-         <div class="col-12 d-flex gap-1 justify-content-start ">  
-             <input type="text" style="width:150px" class="form-control border-dark" name="name" value="" /> 
-             <input type="text" style="width:150px" class="form-control border-dark" name="name" value="" /> 
-             <input type="text" style="width:150px" class="form-control border-dark" name="name" value="" /> 
-             <input type="text" style="width:150px" class="form-control border-dark" name="name" value="" /> 
-             <input type="text" style="width:150px" class="form-control border-dark" name="name" value="" /> 
-         </div>  
-         <div class="col-sm-2 d-flex ">  
-             <button class="btn btn-primary" id="jQueryPost">jQueryPost</button>  
-             <button class="btn btn-outline-info" id="jQueryGet">jQueryGet</button>  
-             <button class="btn btn-secondary" id="jQueryAjaxPost">jQueryAjaxPost</button>  
-             <button class="btn btn-secondary" id="jQueryAjaxGet">jQueryAjaxGet</button>  
-             <button class="btn btn-outline-dark" id="jsAsyncFetchGet" onclick="notFormGet()">jsAsyncFetchGet</button>  
-             <button class="btn btn-outline-dark" id="jsAsyncFetchPost" onclick="notFormPost()">jsAsyncFetchPostPromise</button>  
-         </div>  
+    <div class="row  ">
+        <h4>FormAjax測試</h4>
+        <form id="ajaxForm" class=" ">
 
-     </div>  
+            <div class="row  ">
+                <div class="col-sm-2 d-flex ">
+                    <input type="text" style="width:120px" class="form-control border-dark" name="Id" value="20" placeholder="Id" />
+                    <input type="text" style="width:120px" class="form-control border-dark" name="Name" value="jojo" placeholder="Name" />
+                    <input type="text" style="width:120px" class="form-control border-dark" name="Email" value="joj@gmail.com" placeholder="Email" />
+                    <input type="text" style="width:120px" class="form-control border-dark" name="Age" value="98" placeholder="Age" />
+                    <input type="text" style="width:120px" class="form-control border-dark" name="Fact" value="false" placeholder="Fact" />
+                </div>
+            </div>
+            <div class="row  ">
+                <div class="col-sm-2 d-flex ">
+                    <button type="submit" class="btn btn-primary" id="jQPostForm">jQPostForm</button>
+                    <button type="submit" class="btn btn-outline-info" id="jQueryGetForm">jQueryGetForm</button>
+                    <button type="submit" class="btn btn-secondary" id="JQajaxPostForm">JQajaxPostForm</button>
+                    <button type="submit" class="btn btn-secondary" id="JQajaxPostFormData">JQajaxPostFormData</button>
+                    <button type="submit" class="btn btn-outline-dark" id="jsFetchPostForm" onclick="">jsFetchPostForm</button>
+                    <button type="submit" class="btn btn-outline-dark" id="jsFetchPostFormData" onclick="">jsFetchPostFormData</button>
+                </div>
+            </div>
+        </form>
+
+
+    </div>
     <div class="row justify-content-start">
         <h4>非FormAjax測試</h4>
         <div class="col-2 d-flex ">
@@ -88,7 +96,7 @@
             <button class="btn btn-secondary" id="jQueryAjaxPost">jQueryAjaxPost</button>
             <button class="btn btn-secondary" id="jQueryAjaxGet">jQueryAjaxGet</button>
             <button class="btn btn-outline-dark" id="jsAsyncFetchGet" onclick="notFormGet()">jsAsyncFetchGet</button>
-            <button class="btn btn-outline-dark" id="jsAsyncFetchPost" onclick="notFormPost()">jsAsyncFetchPostPromise</button>          
+            <button class="btn btn-outline-dark" id="jsAsyncFetchPost" onclick="notFormPost()">jsAsyncFetchPostPromise</button>
         </div>
 
     </div>
@@ -101,126 +109,340 @@
 
     <script>
 
+          /************** 表單區 ****************/
 
-        let testObj = {Name:'jo', Age:15, Email:'63333'};
-        let testOutObj;
-        let EmailTail = "test@@mail234.com"
-        let Email = "test@@mail234.com"
+        // .post但抓表格
+        $('#jQPostForm').on('click',(e)=>{
 
-        $('#jQueryPost').on('click', ()=>{
+            e.preventDefault();
 
-          $.post(
-              '/Member/AjaxPostFromForm',testObj, (e)=>{
-                 alert("成功");
-                 testOutObj=e ;
-                 console.log(testOutObj)
-             }).fail(()=>{alert("失敗")})
-        })
+             $.post('@Url.Content("~/Member/AjaxPostFromForm")',$('#ajaxForm').serialize(),
 
-        $('#jQueryGet').on('click',()=>{
-
-             let urlFirst = `@Url.Content("~/Member/AjaxGet?Email=")${EmailTail}`
-             let urlOri = "@Url.Content("~/Member/AjaxGet")"
-
-            $.get(urlFirst).done((e)=>{ alert("成功"); console.log(e)  }).fail(()=>{ alert("大失敗") })
-            $.get(urlOri, {Email:Email},(e)=>
-            {
-                alert("成功2"); console.log(e)
-            })
-            .done((e)=>{
-                alert("成功2-2"); console.log(e)
-            })
-            .fail(()=>{ alert("大失敗2") })
-
-        })
-
-        $('#jQueryAjaxPost').on('click',()=>{
-
-        $.ajax({
-             url:`@Url.Content("~/Member/AjaxPostFromForm")`,
-            method:'post',
-            data: testOutObj,
-           // contentType:'application/json',
-            success:(e)=>{ alert("成功"); console.log(e)},
-            error: ()=>{alert("ajaxpost失敗") }
-        })
-
-        })
-
-        $('#jQueryAjaxGet').on('click',()=>{
-            $.ajax({
-            method:'get',
-             url:'@Url.Content("~/Member/AjaxGet")',
-            data:{Email:testObj.Email}
-            }).done((e)=>{console.log(e)}).fail(()=>{console.log('失敗')});
-          })
-
-        async function notFormGet(){
-
-              let query = new URLSearchParams(testObj);
-
-              try{
-               let result = await fetch( `@Url.Content("~/Member/AjaxGet?")${query}`)
-
-              // console.log(await result.json())
-              console.log(await result.text())
-              }
-              catch(e){
-
-                  console.log("失敗")
-                  console.log(e)
-              }
-
-          }
-
-       let resultA
-
-       function notFormPost(){
-
-           let data = new URLSearchParams(testObj)
-
-
-            fetch( "@Url.Content("~/Member/AjaxFromBody")", {
-           
-               method:'Post',
-               headers:{                   
-                    
-                   // "Content-Type":"application/x-www-form-urlencoded" //Use [FromForm] or default at backend
-                    "Content-Type":"application/json"
-               },
-                  // body:data
-                 body:JSON.stringify(testObj)
-             }).then((s)=>{
-                                 
-
-                 return s.json();
-              
-             }).then((s)=>{
-
-                   resultA = s;
-
-                 console.log(s)
-             })
-             
-             .catch((e)=>{
-
-                 alert("失敗")
+             (e)=>{
+                 alert('成功');
                  console.log(e)
-             
-             })         
+             }
+             ).fail((e)=>{
+                 alert('失敗');
+                 console.log(e)
+             })
 
-             
+        })
+
+        // .get但抓表格
+        $('#jQueryGetForm').on('click',(e)=>{
+
+             e.preventDefault();
+
+             $.get('@Url.Content("~/Member/AjaxGet")',
+             $('#ajaxForm').serialize(),(e)=>{
+                 alert('成功');
+                 console.log(e)
+             }).fail((e)=>{
+                 alert('失敗');
+                 console.log(e)
+             })
+         })
+
+        // JQajaxPost 抓表格(&新建)
+        $('#JQajaxPostForm').on('click',(e)=>{
+
+            e.preventDefault();
+
+            //抓
+            let form = $('#ajaxForm').serialize()
+
+            //新建
+            let directObj =testObj
+
+            $.ajax({
+
+                url:'@Url.Content("~/Member/AjaxPostFromForm")',
+                method:'post',
+                contentType:'application/x-www-form-urlencoded', //可寫可不寫
+                // data:form
+                data: directObj
+            }).done((e)=>{
+                 alert('成功');
+                 console.log(e)
+             }).fail((e)=>{
+                 alert('失敗');
+                 console.log(e)
+             })
+
+
+
+        })
+
+
+        // JQajaxPost FormData(抓轉&新建)
+        $('#JQajaxPostFormData').on('click',  (e)=>{
+
+            //轉
+            let upForm = $('#ajaxForm')
+            let formdata = new FormData(upForm[0]);
+
+            //新建
+            let formdata2 = new FormData()
+            let inputs = Object.entries(testObj);
+            inputs.forEach((input)=>{
+
+                formdata2.append(input[0],input[1])
+
+            })
             
-       }
+
+            e.preventDefault();
+
+
+             $.ajax({
+
+                url:'@Url.Content("~/Member/AjaxPostFromForm")',
+                method:'post',             
+                data: formdata,
+                processData:false,
+                contentType:false
+
+            }).done((e)=>{
+                 alert('成功1');
+                 console.log(e);
+
+                 $.ajax({
+                          url:'@Url.Content("~/Member/AjaxPostFromForm")',
+                          method:'post',
+                          data: formdata2,                
+                          processData:false,
+                          contentType:false
+
+                       }).done((e)=>{
+                            alert('成功2');
+                            console.log(e);
+                             
+                        }).fail((e)=>{
+                            alert('失敗2');
+                            console.log(e)
+                 })
+
+             }).fail((e)=>{
+                 alert('失敗1');
+                 console.log(e)
+             })
+
+
+
+        })
+
+       
+         // fetchPost 抓表格 (&新建)
+         $('#jsFetchPostForm').on('click',async function(e){
+
+             
+             //抓
+             let Query = new URLSearchParams();
+              document.querySelectorAll('#ajaxForm input[name]').forEach((input)=>{
+
+                     Query.append(input.name, input.value)
+              
+              })
+                          
+
+
+             //新建
+             let newQuery = new URLSearchParams();
+             Object.entries(testObj).forEach((input)=>{
+
+             newQuery.append(input[0],input[1])             
+             
+             })
+
+             e.preventDefault();
+
+             try {
+                 
+                 let response = await fetch('@Url.Content("~/Member/AjaxPostFromForm")',{
+                 method:'post',
+                 body:Query,
+                 headers:{
+                 'Content-Type':'application/x-www-form-urlencoded'
+                 }               
+
+                 });
+                 let result = await response.json();
+                 alert('成功1')
+                 console.log(result)
+
+                  response = await fetch('@Url.Content("~/Member/AjaxPostFromForm")',{
+                 method:'post',
+                 body:newQuery,
+                 headers:{
+                 'Content-Type':'application/x-www-form-urlencoded'
+                 }
+
+                 });
+                 result = await response.json();
+                 alert('成功2')
+                 console.log(result)
+
+
+             }
+             catch(e) {
+
+                alert('失敗')
+            
+                console.log(e);
+             
+             }
+              
+         
+         }) 
+
+         // fetchPostFormdata 抓表格 (轉)
+         $('#jsFetchPostFormData').on('click',async (e)=>{
+                
+             e.preventDefault()
+             
+             try{
+
+                let formdata = new FormData(document.querySelector('#ajaxForm'))
+                let resp = await fetch('@Url.Content("~/Member/AjaxPostFromForm")',{
+
+                    method:'post',
+                    body:formdata
+
+                });
+                let result = await resp.json();
+                alert('success!!')
+                console.log(result)
+
+             }catch(error){
+             
+                alert('fail!!')
+                console.log(error)
+             
+             
+             }
+            
+         
+         })
+
+
+         let testObj = {Name:'jo', Age:15, Email:'63333'};
+         let testOutObj;
+         let EmailTail = "test@@mail234.com"
+         let Email = "test@@mail234.com"
 
 
 
 
 
+         $('#jQueryPost').on('click', ()=>{
+
+           $.post(
+               '/Member/AjaxPostFromForm',testObj, (e)=>{
+                  alert("成功");
+                  testOutObj=e ;
+                  console.log(testOutObj)
+              }).fail(()=>{alert("失敗")})
+         })
+
+         $('#jQueryGet').on('click',()=>{
+
+              let urlFirst = `@Url.Content("~/Member/AjaxGet?Email=")${EmailTail}`
+              let urlOri = "@Url.Content("~/Member/AjaxGet")"
+
+             $.get(urlFirst).done((e)=>{ alert("成功"); console.log(e)  }).fail(()=>{ alert("大失敗") })
+             $.get(urlOri, {Email:Email},(e)=>
+             {
+                 alert("成功2"); console.log(e)
+             })
+             .done((e)=>{
+                 alert("成功2-2"); console.log(e)
+             })
+             .fail(()=>{ alert("大失敗2") })
+
+         })
+
+         $('#jQueryAjaxPost').on('click',()=>{
+
+         $.ajax({
+              url:`@Url.Content("~/Member/AjaxPostFromForm")`,
+             method:'post',
+             data: testOutObj,
+            // contentType:'application/json',
+             success:(e)=>{ alert("成功"); console.log(e)},
+             error: ()=>{alert("ajaxpost失敗") }
+         })
+
+         })
+
+         $('#jQueryAjaxGet').on('click',()=>{
+             $.ajax({
+             method:'get',
+              url:'@Url.Content("~/Member/AjaxGet")',
+             data:{Email:testObj.Email}
+             }).done((e)=>{console.log(e)}).fail(()=>{console.log('失敗')});
+           })
+
+         async function notFormGet(){
+
+               let query = new URLSearchParams(testObj);
+
+               try{
+                let result = await fetch( `@Url.Content("~/Member/AjaxGet?")${query}`)
+
+               // console.log(await result.json())
+               console.log(await result.text())
+               }
+               catch(e){
+
+                   console.log("失敗")
+                   console.log(e)
+               }
+
+           }
+
+        let resultA
+
+        function notFormPost(){
+
+            let data = new URLSearchParams(testObj)
+
+
+             fetch( "@Url.Content("~/Member/AjaxFromBody")", {
+
+                method:'Post',
+                headers:{
+
+                    // "Content-Type":"application/x-www-form-urlencoded" //Use [FromForm] or default at backend
+                     "Content-Type":"application/json"
+                },
+                   // body:data
+                  body:JSON.stringify(testObj)
+              }).then((s)=>{
+
+
+                  return s.json();
+
+              }).then((s)=>{
+
+                    resultA = s;
+
+                  console.log(s)
+              })
+
+              .catch((e)=>{
+
+                  alert("失敗")
+                  console.log(e)
+
+              })
 
 
 
-      
+        }
+
+
+
 
     </script>
 

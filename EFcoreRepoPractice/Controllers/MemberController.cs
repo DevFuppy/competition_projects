@@ -368,17 +368,12 @@ namespace EFcoreRepoPractice.Controllers
 
 
 
-        public record TestAjaxModel(int? Id=null, string? Email = null, string? Name = null, int? Age=null, bool? Fact = true);
-
-        // public class TestAjaxModel { 
-
-        //public  int Age { get; set; }
-
-        // }
 
 
 
         #region Ajax測試區
+
+        public record TestAjaxModel(int? Id = null, string? Email = null, string? Name = null, int? Age = null, bool? Fact = true);
 
 
         [HttpPost]
