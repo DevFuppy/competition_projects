@@ -8,6 +8,7 @@ using EFcoreRepoPractice.Application.Services;
 using EFcoreRepoPractice.Data;
 using EFcoreRepoPractice.Infrastructure.repos;
 using EFcoreRepoPractice.Models;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -89,9 +90,13 @@ namespace EFcoreRepoPractice.Controllers
 
         }
 
+
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<ActionResult> ForgotPasswordSendingEmail(ForgetPasswordViewModel fg)
         {
+
+            if(!ModelState.IsValid) return RedirectToAction("ForgotPassword");
 
             string token = Guid.NewGuid().ToString();
 
@@ -111,6 +116,7 @@ namespace EFcoreRepoPractice.Controllers
 
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<ActionResult> UpdatePasswordAction(UpdatePasswordViewModel up, CancellationToken ct)
         {
@@ -144,6 +150,7 @@ namespace EFcoreRepoPractice.Controllers
         /// 登入動作與驗證
         /// </summary>
         /// <returns></returns>
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel lgvm)
         {
@@ -186,10 +193,9 @@ namespace EFcoreRepoPractice.Controllers
             }
 
 
-
-
         }
 
+        
         /// <summary>
         /// 登出動作
         /// </summary>
@@ -215,6 +221,7 @@ namespace EFcoreRepoPractice.Controllers
             return View();
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel rgvm)
         {
@@ -252,9 +259,6 @@ namespace EFcoreRepoPractice.Controllers
                 TempData["RegisterMsg"] = "系統錯誤!請聯絡管理員";
                 return RedirectToAction("Login");
             }
-
-
-            
 
         }
         #endregion

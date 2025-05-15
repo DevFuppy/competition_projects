@@ -92,6 +92,17 @@
 
         })
 
+                $('document').ready(
+        ()=>{
+ 
+
+            if("@TempData["LoginMsg"]" !== "")
+            {
+               alert( "@Html.Raw(TempData["LoginMsg"])"  )
+            } 
+
+
+        })
 
 
     </script>

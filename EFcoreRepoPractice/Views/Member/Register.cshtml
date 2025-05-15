@@ -3,12 +3,6 @@
 @{
     ViewData["Title"] = "註冊帳號";
 }
-@* @if (TempData["RegisterMsg"] is not null) *@
-@* { *@
-
-@*     <h2 style="color:red">@TempData["RegisterMsg"]</h2> *@
-@* } *@
-
 
 
 <div class="container mt-5">
@@ -55,16 +49,13 @@
     <script>
         $('document').ready(
             (e)=>{
-
- 
-                const messages = @Json.Serialize(TempData["RegisterMsg"]) 
-                            
+                
+                const messages = @Json.Serialize(TempData["RegisterMsg"])                             
 
                 if(messages.length !== 0)
                 {
                    messages.forEach(i=>alert(i))
                 }
-
 
             })
     </script>

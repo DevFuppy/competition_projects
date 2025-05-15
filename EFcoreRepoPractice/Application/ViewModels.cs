@@ -51,9 +51,9 @@ namespace EFcoreRepoPractice.Application
     {
 
         [Display(Name = "電子郵件")]
-        [Required]
-        [EmailAddress]
-        [MaxLength(100)]
+        [Required(ErrorMessage = "必填")]
+        [EmailAddress(ErrorMessage = "必須為電子郵件格式")]
+        [MaxLength(100, ErrorMessage = "長度過長")]
         public string Email { get; set; } 
 
 

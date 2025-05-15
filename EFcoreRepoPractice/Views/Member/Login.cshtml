@@ -4,29 +4,21 @@
     ViewData["Title"] = "登入頁面";
 }
 
-@if (TempData["LoginMsg"] is not null)
-{
+@* @if (TempData["LoginMsg"] is not null) *@
+@* { *@
 
-    <h2 style="color:red">@TempData["LoginMsg"]</h2>
-}
+@*     <h2 style="color:red">@TempData["LoginMsg"]</h2> *@
+@* } *@
 
-@if (TempData["UpdatePasswordMsg"] is not null)
-{
+@* @if (TempData["UpdatePasswordMsg"] is not null) *@
+@* { *@
 
-    string co = TempData["UpdatePasswordMsg"].ToString() == "變更成功" ? "green" : "red";
+@*     string co = TempData["UpdatePasswordMsg"].ToString() == "變更成功" ? "green" : "red"; *@
 
-    <h2 style="color:@co">   @TempData["UpdatePasswordMsg"]   </h2>
+@*     <h2 style="color:@co">   @TempData["UpdatePasswordMsg"]   </h2> *@
 
-}
-@* @if (TempData["RegisterMsg"] is not null)
-{
-
-    List<string> co =  
-
-     
-
-} *@
-
+@* } *@
+ 
 
 
 
@@ -115,8 +107,7 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-
-        
+                
 
         $('document').ready( 
         ()=>{
@@ -125,9 +116,21 @@
             {
                alert( "@Html.Raw(TempData["RegisterMsg"])"  )
             }
+
+            if("@TempData["LoginMsg"]" !== "")
+            {
+               alert( "@Html.Raw(TempData["LoginMsg"])"  )
+            }
+
+            if("@TempData["UpdatePasswordMsg"]" !== "")
+            {
+               alert( "@Html.Raw(TempData["UpdatePasswordMsg"])"  )
+            }
                          
         
         })
+
+
 
 
           /************** 表單區 ****************/
