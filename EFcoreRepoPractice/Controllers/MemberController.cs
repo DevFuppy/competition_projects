@@ -401,7 +401,7 @@ namespace EFcoreRepoPractice.Controllers
 
         public record TestAjaxModel(int? Id = null, string? Email = null, string? Name = null, int? Age = null, bool? Fact = true);
 
-
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult AjaxFromBody([FromBody] TestAjaxModel tam)
         {
@@ -421,7 +421,7 @@ namespace EFcoreRepoPractice.Controllers
             return Ok(Email);
         }
 
-
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult AjaxPostFromForm(TestAjaxModel tam)
         {
@@ -431,6 +431,14 @@ namespace EFcoreRepoPractice.Controllers
             return Json(newTam);
         }
 
+        [HttpPost]
+        public IActionResult AjaxPostFromFormJustPost(TestAjaxModel tam)
+        {
+
+            var newTam = tam with { Age = tam.Age + 20 };
+
+            return Json(newTam);
+        }
 
 
         #endregion

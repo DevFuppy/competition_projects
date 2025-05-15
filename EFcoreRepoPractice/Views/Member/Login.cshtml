@@ -63,7 +63,7 @@
     <div class="row  ">
         <h4>FormAjax測試</h4>
         <form id="ajaxForm" class=" ">
-
+            @Html.AntiForgeryToken()
             <div class="row  ">
                 <div class="col-sm-2 d-flex ">
                     <input type="text" style="width:120px" class="form-control border-dark" name="Id" value="20" placeholder="Id" />
@@ -107,7 +107,13 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-                
+
+        let tokens = $('form [name=__RequestVerificationToken]')
+        let tokenName = tokens.attr('name')
+        let tokenValues = tokens.map((index,item)=> item.value ).get();
+        let t1 = tokenValues[0]
+        let t2 = tokenValues[1]
+        
 
         $('document').ready( 
         ()=>{
@@ -140,7 +146,7 @@
 
             e.preventDefault();
 
-             $.post('@Url.Content("~/Member/AjaxPostFromForm")',$('#ajaxForm').serialize(),
+             $.post('@Url.Content("~/Member/AjaxPostFromFormJustPost")',$('#ajaxForm').serialize(),
 
              (e)=>{
                  alert('成功');
@@ -177,10 +183,10 @@
             let form = $('#ajaxForm').serialize()
 
             //新建
-            let directObj =testObj
+            let directObj ={...testObj}
+            directObj[tokenName] = t2
 
             $.ajax({
-
                 url:'@Url.Content("~/Member/AjaxPostFromForm")',
                 method:'post',
                 contentType:'application/x-www-form-urlencoded', //可寫可不寫
@@ -193,8 +199,6 @@
                  alert('失敗');
                  console.log(e)
              })
-
-
 
         })
 
@@ -214,6 +218,8 @@
                 formdata2.append(input[0],input[1])
 
             })
+
+            formdata2.append(tokenName,t1)
             
 
             e.preventDefault();
@@ -223,7 +229,7 @@
 
                 url:'@Url.Content("~/Member/AjaxPostFromForm")',
                 method:'post',             
-                data: formdata,
+                data: formdata2,
                 processData:false,
                 contentType:false
 
@@ -234,7 +240,7 @@
                  $.ajax({
                           url:'@Url.Content("~/Member/AjaxPostFromForm")',
                           method:'post',
-                          data: formdata2,                
+                          data: formdata,                
                           processData:false,
                           contentType:false
 
@@ -258,7 +264,8 @@
                
          // fetchPost 抓表格 (&新建)
          $('#jsFetchPostForm').on('click',async function(e){
-
+             
+             e.preventDefault();
              
              //抓
              let Query = new URLSearchParams();
@@ -266,26 +273,28 @@
 
                      Query.append(input.name, input.value)
               
-              })
-                          
+              })        
+              //其實也可以抓new FormData(表格)，丟進new URLSearchParams()建構參數內
+              // let QueryByFormData = new URLSearchParams(new FormData('#ajaxForm input[name]'));
 
 
              //新建
              let newQuery = new URLSearchParams(testObj);
-             // Object.entries(testObj).forEach((input)=>{
+             //可選 Object.entries(testObj).forEach((input)=>{
 
              // newQuery.append(input[0],input[1])             
              
              // })
+             newQuery.append(tokenName,t1)
 
 
-             e.preventDefault();
+             
 
              try {
                  
                  let response = await fetch('@Url.Content("~/Member/AjaxPostFromForm")',{
                  method:'post',
-                 body:Query,
+                 body:newQuery,
                  headers:{
                  'Content-Type':'application/x-www-form-urlencoded'
                  }               
@@ -295,17 +304,17 @@
                  alert('成功1')
                  console.log(result)
 
-                 response = await fetch('@Url.Content("~/Member/AjaxPostFromForm")',{
+                 let response2 = await fetch('@Url.Content("~/Member/AjaxPostFromForm")',{
                  method:'post',
-                 body:newQuery,
+                 body:Query,
                  headers:{
                  'Content-Type':'application/x-www-form-urlencoded'
                  }
 
                  });
-                 result = await response.json();
+                 let result2 = await response2.json();
                  alert('成功2')
-                 console.log(result)
+                 console.log(result2)
 
 
              }
@@ -350,19 +359,21 @@
          })
 
 
+
+
+
+        /************** 非表單區 ****************/
+
+
          let testObj = {Name:'jo', Age:15, Email:'63333'};
          let testOutObj;
          let EmailTail = "test@@mail234.com"
          let Email = "test@@mail234.com"
 
-
-
-
-
          $('#jQueryPost').on('click', ()=>{
 
            $.post(
-               '/Member/AjaxPostFromForm',testObj, (e)=>{
+               '/Member/AjaxPostFromFormJustPost',testObj, (e)=>{
                   alert("成功");
                   testOutObj=e ;
                   console.log(testOutObj)
@@ -388,10 +399,13 @@
 
          $('#jQueryAjaxPost').on('click',()=>{
 
+             let paraObj = {...testObj};
+                 paraObj[tokenName] = t1;
+
          $.ajax({
               url:`@Url.Content("~/Member/AjaxPostFromForm")`,
              method:'post',
-             data: testOutObj,
+             data: paraObj,
             // contentType:'application/json',
              success:(e)=>{ alert("成功"); console.log(e)},
              error: ()=>{alert("ajaxpost失敗") }
@@ -427,30 +441,35 @@
 
         let resultA
 
-        function notFormPost(){
+        function notFormPost(){                      
+            
+            let paraObj = {...testObj}
+            paraObj[tokenName] = t1;
 
-            let data = new URLSearchParams(testObj)
+            let data = new URLSearchParams(paraObj)
 
-
-             fetch( "@Url.Content("~/Member/AjaxFromBody")", {
+            fetch( "@Url.Content("~/Member/AjaxPostFromForm")"
+             // fetch( "@Url.Content("~/Member/AjaxFromBody")"
+             , {
 
                 method:'Post',
                 headers:{
+                    // "RequestVerificationToken":t2,                    
+                     // "Content-Type":"application/json"
 
-                    // "Content-Type":"application/x-www-form-urlencoded" //Use [FromForm] or default at backend
-                     "Content-Type":"application/json"
+                     "Content-Type":"application/x-www-form-urlencoded" //Use [FromForm] or default at backend
                 },
-                   // body:data
-                  body:JSON.stringify(testObj)
+                   body:data
+                  // body:JSON.stringify(testObj)
               }).then((s)=>{
-
+ 
 
                   return s.json();
 
               }).then((s)=>{
 
                     resultA = s;
-
+                alert("成功")
                   console.log(s)
               })
 
