@@ -116,11 +116,11 @@ namespace EFcoreRepoPractice.Controllers
         {
 
             dynamic result = await _emailhandler.UpdatePasswordWithTokenAsync(up, ct);
-            
+
             Type type = result.GetType();
-            
-            TempData["UpdatePasswordMsg"]  = type == typeof(String)? result:"變更成功";            
-            
+
+            TempData["UpdatePasswordMsg"] = type == typeof(String) ? result : "變更成功";
+
             return RedirectToAction("Login");
         }
 
@@ -136,8 +136,7 @@ namespace EFcoreRepoPractice.Controllers
         /// <returns></returns>
         [HttpGet]
         public IActionResult Login()
-        {
-
+        { 
             return View();
         }
 
@@ -174,7 +173,7 @@ namespace EFcoreRepoPractice.Controllers
             catch (SaltParseException Salt)
             {
 
-                TempData["LoginMsg"] = "資料庫層級錯誤: "+ Salt.Message;
+                TempData["LoginMsg"] = "資料庫層級錯誤: " + Salt.Message;
                 return RedirectToAction("Login");
 
             }
@@ -186,7 +185,7 @@ namespace EFcoreRepoPractice.Controllers
 
             }
 
-            
+
 
 
         }
@@ -212,22 +211,50 @@ namespace EFcoreRepoPractice.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-
+           
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel rgvm)
         {
+            
+            
+            if (!ModelState.IsValid)
+            {
+                List<string> errors = new List<string>();
 
-            //Model.state
-            //要記得寫trycatch
-            //ViewData丟出去可顯示新增哪一筆
+                foreach (var i in ModelState.Values)
+                {
+                    
+                    foreach (var j in i.Errors) {
+
+                        errors.Add(j.ErrorMessage);
+
+                    }
+                    
+                }
+
+                TempData["RegisterMsg"] = errors;
+                return RedirectToAction("Register");
+            }
 
 
-            await _memberLogin.MemberRegistration(new(rgvm.Email, rgvm.Password));
 
-            return RedirectToAction("GetAll");
+            try
+            {
+                await _memberLogin.MemberRegistration(new(rgvm.Email, rgvm.Password));
+                TempData["RegisterMsg"] = "註冊成功"; 
+                return RedirectToAction("Login");
+            }
+            catch
+            {
+                TempData["RegisterMsg"] = "系統錯誤!請聯絡管理員";
+                return RedirectToAction("Login");
+            }
+
+
+            
 
         }
         #endregion
@@ -366,20 +393,16 @@ namespace EFcoreRepoPractice.Controllers
 
         #endregion
 
-
-
-
-
-
         #region Ajax測試區
 
         public record TestAjaxModel(int? Id = null, string? Email = null, string? Name = null, int? Age = null, bool? Fact = true);
 
 
         [HttpPost]
-        public IActionResult AjaxFromBody([FromBody]TestAjaxModel tam) {
+        public IActionResult AjaxFromBody([FromBody] TestAjaxModel tam)
+        {
 
-            var newTam = tam with { Age=tam.Age+20 };
+            var newTam = tam with { Age = tam.Age + 20 };
 
             return Json(newTam);
         }

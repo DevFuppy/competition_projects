@@ -3,6 +3,11 @@
 @{
     ViewData["Title"] = "註冊帳號";
 }
+@* @if (TempData["RegisterMsg"] is not null) *@
+@* { *@
+
+@*     <h2 style="color:red">@TempData["RegisterMsg"]</h2> *@
+@* } *@
 
 
 
@@ -46,4 +51,22 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $('document').ready(
+            (e)=>{
+
+ 
+                const messages = @Json.Serialize(TempData["RegisterMsg"]) 
+                            
+
+                if(messages.length !== 0)
+                {
+                   messages.forEach(i=>alert(i))
+                }
+
+
+            })
+    </script>
+
 }

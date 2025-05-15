@@ -18,7 +18,14 @@
     <h2 style="color:@co">   @TempData["UpdatePasswordMsg"]   </h2>
 
 }
+@* @if (TempData["RegisterMsg"] is not null)
+{
 
+    List<string> co =  
+
+     
+
+} *@
 
 
 
@@ -109,6 +116,20 @@
 
     <script>
 
+        
+
+        $('document').ready( 
+        ()=>{
+
+            if("@TempData["RegisterMsg"]" !== "")
+            {
+               alert( "@Html.Raw(TempData["RegisterMsg"])"  )
+            }
+                         
+        
+        })
+
+
           /************** 表單區 ****************/
 
         // .post但抓表格
@@ -180,7 +201,7 @@
 
             //轉
             let upForm = $('#ajaxForm')
-            let formdata = new FormData(upForm[0]);
+            let formdata = new FormData(upForm.get(0));
 
             //新建
             let formdata2 = new FormData()
@@ -231,8 +252,7 @@
 
 
         })
-
-       
+               
          // fetchPost 抓表格 (&新建)
          $('#jsFetchPostForm').on('click',async function(e){
 
@@ -248,12 +268,13 @@
 
 
              //新建
-             let newQuery = new URLSearchParams();
-             Object.entries(testObj).forEach((input)=>{
+             let newQuery = new URLSearchParams(testObj);
+             // Object.entries(testObj).forEach((input)=>{
 
-             newQuery.append(input[0],input[1])             
+             // newQuery.append(input[0],input[1])             
              
-             })
+             // })
+
 
              e.preventDefault();
 
@@ -271,7 +292,7 @@
                  alert('成功1')
                  console.log(result)
 
-                  response = await fetch('@Url.Content("~/Member/AjaxPostFromForm")',{
+                 response = await fetch('@Url.Content("~/Member/AjaxPostFromForm")',{
                  method:'post',
                  body:newQuery,
                  headers:{
@@ -294,9 +315,9 @@
              }
               
          
-         }) 
+         })
 
-         // fetchPostFormdata 抓表格 (轉)
+         // fetchPostFormdata  Formdata抓表格 (轉)
          $('#jsFetchPostFormData').on('click',async (e)=>{
                 
              e.preventDefault()

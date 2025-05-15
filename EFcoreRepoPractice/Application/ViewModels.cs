@@ -10,22 +10,22 @@ namespace EFcoreRepoPractice.Application
         //public string Account { get; set; }
 
         [Display(Name ="電子郵件")]
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "Email為必填欄位")]
+        [EmailAddress(ErrorMessage = "必須為電子郵件格式")]
         [MaxLength(100)]
         public string Email { get; set; }
 
 
         [Display(Name = "密碼")]
-        [Required]
-        //[DataType(DataType.Password)]
-        [MinLength(6)]
+        [Required(ErrorMessage = "密碼為必填欄位")]
+        [DataType(DataType.Password)]
+        [MinLength(6, ErrorMessage = "長度至少六位")]
         public string Password { get; set; }
 
         [Display(Name = "確認密碼")]
-        [Required]
-        [Compare("Password")]
-        //[DataType(DataType.Password)]
+        [Required(ErrorMessage = "確認密碼為必填欄位")]
+        [Compare("Password",ErrorMessage = "密碼與確認密碼不一致")]
+        [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 
     }
