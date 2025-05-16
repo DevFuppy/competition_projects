@@ -45,7 +45,7 @@ namespace EFcoreRepoPractice.Application
         [Display(Name = "密碼")]
         [Required(ErrorMessage = "密碼為必填欄位")]
         [DataType(DataType.Password)]
-        [StringLength(20, MinimumLength = 8)]
+        //[StringLength(20, MinimumLength = 8)]
         public string Password { get; set; }
 
 
@@ -76,8 +76,9 @@ namespace EFcoreRepoPractice.Application
         public string Password { get; set; }
 
         [Display(Name = "確認密碼")]
-        [Required]
-        [Compare("Password")]
+        [Required(ErrorMessage = "確認密碼為必填欄位")]
+        [Compare("Password", ErrorMessage = "密碼與確認密碼不一致")]
+        [DataType(DataType.Password)]
         //[DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 
