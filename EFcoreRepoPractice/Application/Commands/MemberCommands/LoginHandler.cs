@@ -19,8 +19,9 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
         {
 
             var entity = _uow.GetRepository<Member>();
+            bool HasAccount = await entity.GetAll().AnyAsync(e => e.Email == q.Email);
 
-            if(entity.GetSelectively(e=>e.Email == q.Email) is not null)throw new InvalidOperationException("Email已註冊");
+            if (HasAccount) throw new InvalidOperationException("Email已註冊");
 
             var pwd = PasswordHasher.GenerateHashPwd(q.Password);
             var member = new Member { Email = q.Email, Password = pwd };
@@ -30,7 +31,6 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
             {
 
                 entity.Create(member);
-
 
             });
 
