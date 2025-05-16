@@ -168,7 +168,6 @@ namespace EFcoreRepoPractice.Controllers
                 {
                     TempData["LoginMsg"] = "帳號或密碼錯誤";
                     return View(result);
-
                 }
 
 
@@ -300,10 +299,12 @@ namespace EFcoreRepoPractice.Controllers
             //var vm = members.Select(x => new { Id = x.MemberId, x.Name, x.Email, x.Age, x.Password });
 
             ViewBag.Test = "測試用";
-
+            
             IEnumerable<MemberDTO?>? handler = await _memberGet.GetAllMemberHandler(ct);
-            return handler is null ? NotFound() : View(handler);
 
+            ViewBag.User = User?.Identity?.Name;
+
+            return handler is null ? NotFound() : View(handler);                 
 
         }
         #endregion
