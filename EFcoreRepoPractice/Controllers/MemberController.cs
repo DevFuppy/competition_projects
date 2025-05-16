@@ -161,7 +161,7 @@ namespace EFcoreRepoPractice.Controllers
             try
             {
 
-                MemberDTO? result = await _memberLogin.LoginVerification(new(lgvm.Email, lgvm.Password));
+                MemberDTO? result = await _memberLogin.LoginVerificationAsync(new(lgvm.Email, lgvm.Password));
 
 
                 if (result is null)
@@ -250,8 +250,13 @@ namespace EFcoreRepoPractice.Controllers
 
             try
             {
-                await _memberLogin.MemberRegistration(new(rgvm.Email, rgvm.Password));
-                TempData["RegisterMsg"] = "註冊成功"; 
+                await _memberLogin.MemberRegistrationAsync(new(rgvm.Email, rgvm.Password));
+                TempData["RegisterMsg"] = "註冊成功";
+                return RedirectToAction("Login");
+            }
+            catch(InvalidOperationException IO)
+            {
+                TempData["RegisterMsg"] = IO.Message;                
                 return RedirectToAction("Login");
             }
             catch

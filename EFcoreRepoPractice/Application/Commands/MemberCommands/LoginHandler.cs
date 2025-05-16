@@ -15,10 +15,13 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
         public LoginHandler(IUnitOfWork uow) => _uow = uow;
 
 
-        public async Task MemberRegistration(RegisterMemberCommand q, CancellationToken ct = default)
+        public async Task MemberRegistrationAsync(RegisterMemberCommand q, CancellationToken ct = default)
         {
 
             var entity = _uow.GetRepository<Member>();
+
+            if(entity.GetSelectively(e=>e.Email == q.Email) is not null)throw new InvalidOperationException("Email已註冊");
+
             var pwd = PasswordHasher.GenerateHashPwd(q.Password);
             var member = new Member { Email = q.Email, Password = pwd };
 
@@ -35,7 +38,7 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
         }
 
 
-        public async Task<MemberDTO?> LoginVerification(LoginInfo q, CancellationToken ct = default)
+        public async Task<MemberDTO?> LoginVerificationAsync(LoginInfo q, CancellationToken ct = default)
         {
             var entity = _uow.GetRepository<Member>();
             var memberList = entity.GetAll();
@@ -46,7 +49,6 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
 
             try
             {
-
                 var x = PasswordHasher.VerifyHashPwd(q.pwd, member.Password);
 
                 if (member.Password is null || !PasswordHasher.VerifyHashPwd(q.pwd, member.Password)) return null;
@@ -56,10 +58,7 @@ namespace EFcoreRepoPractice.Application.Commands.MemberCommands
             }
             catch (SaltParseException saltwrong)
             {
-
-
-                throw new SaltParseException("資料庫密碼無加鹽", saltwrong);
-
+                throw new SaltParseException($"資料庫密碼無加鹽{saltwrong.Message}", saltwrong);
             }
 
             
