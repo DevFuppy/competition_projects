@@ -1,8 +1,8 @@
 ﻿ @model IEnumerable<MemberDTO?>
 
 @{
-    ViewData["title"] = "會員列表";
-
+    ViewData["title"] = "會員列表";   
+    var memberList = Model.OrderByDescending(x => x?.Email == ViewBag.User);    
 }
 
 
@@ -41,7 +41,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var c in Model)
+        @foreach (var c in memberList)
         {
             <tr>
                 <td>@c.Id</td>
