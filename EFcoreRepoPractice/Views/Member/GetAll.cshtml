@@ -16,8 +16,16 @@
     <h2 style="color:lightseagreen">@TempData["LoginMsg"]</h2>
 }
 
-@* <button id="tvb">TestViewBag</button> *@
 
+<style>
+    .readonly-style {
+        background-color: #343a40; /* 深灰：與暗色背景區隔但不突兀 */
+        color: #ced4da; /* Bootstrap text-light 類系的亮灰白 */
+        border: 1px solid #495057; /* 深邊框，略低調但有存在感 */
+        cursor: not-allowed; /* 滑鼠提示為無法編輯 */
+    }
+
+</style>
 
 <div>
 
@@ -28,79 +36,59 @@
 
 <div style="height:60px">
     <h2 class="mb-4" style="display:inline">會員列表</h2>
-    @* <a asp-action="Register">註冊帳號</a> *@
+
 </div>
 
-<table class="table table-bordered table-hover table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>編號Id</th>
-            <th>姓名</th>
-            <th>Email</th>
-            <th>年齡</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var c in memberList)
-        {
-            <tr>
-                <td>@c.Id@(ViewBag.User == c.Email ? " [現正登入]" : "")</td>
-                <td>@c.Name</td>
-                <td>@c.Email</td>
-                <td>@c.Age</td>
-                <td>
-                    @* <a class="btn btn-sm btn-primary" href="#">檢視</a> *@
-                    <a class="btn btn-sm btn-warning" href="#">編輯</a>
-                    @if (ViewBag.User != c.Email)
-                    {
-                        <a class="btn btn-sm btn-danger" id="@c.Id @c.Email @c.Name" asp-action="Delete" asp-route-id="@c.Id">刪除</a>
-                    }
 
-                </td>
-            </tr>
-        }
-
-    </tbody>
-</table>
- 
 <div class="accordion" id="accordionExample">
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-        Accordion Item #1
-      </button>
-    </h2>
-        <div id="collapseOne" class="accordion-collapse collapse show" >
-      <div class="accordion-body">
-        <strong>This is the first item’s accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It’s also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-      </div>
-    </div>
-  </div>
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-        Accordion Item #2
-      </button>
-    </h2>
-        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-        <strong>This is the second item’s accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It’s also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-      </div>
-    </div>
-  </div>
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-        Accordion Item #3
-      </button>
-    </h2>
-        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent=" #accordionExample">
-      <div class="accordion-body">
-        <strong>This is the third item’s accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It’s also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-      </div>
-    </div>
-  </div>
+    @foreach (var c in memberList)
+    {
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button @(ViewBag.User == c.Email ? "" : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@c.Id" aria-expanded="true" aria-controls="collapse-@c.Id">
+                    編號：<span>  @c.Id </span>@(ViewBag.User == c.Email ? " [現正登入]" : "")
+                </button>
+            </h2>
+            <div id="collapse-@c.Id" class="accordion-collapse collapse @(ViewBag.User == c.Email ? "show" : "") ">
+                <div class="accordion-body">
+
+                    <div class="row justify-content-around">
+                        <div class="col-2">
+                            <div>
+                                <strong>姓名：</strong> <input type="text" value="@c.Name" readonly class="readonly-style">
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div>
+                                <strong>Email：</strong> <input type="text" value="@c.Email" readonly class="readonly-style" style="width:230px">
+                            </div>
+                        </div>
+
+                        <div class="col-2">
+                            <div>
+                                <strong>年齡：</strong> <input type="text" value="@c.Age" class="readonly-style" readonly>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <button class="btn btn-sm btn-outline-success" id="submit" hidden onclick="">送出</button>
+                        </div>
+                        <div class="col-2 buttons">
+                            <a class="btn btn-sm btn-warning editBtn" href="#" id="edit"  onclick="">編輯</a>
+                            @if (ViewBag.User != c.Email)
+                            {
+                                <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@c.Id">刪除</a>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+
 
 @section Scripts {
 
@@ -134,7 +122,7 @@
 
         })
 
-                $('document').ready(
+        $('document').ready(
         ()=>{
 
 
@@ -145,6 +133,66 @@
 
 
         })
+
+
+
+        $('.editBtn').on('click',toggle_update);      
+
+        function toggle_update(){
+
+          let theRow = $(this).closest('.row')
+          let inputs = theRow .find('input')
+          let submit = theRow. find('button#submit')
+
+          console.log(this)
+         
+          
+
+          if( inputs.attr('readonly'))
+          {
+             inputs.removeAttr('readonly')
+             submit.removeAttr('hidden')
+          }
+          else
+          {
+             inputs.attr('readonly','readonly')
+             submit.attr('hidden','hidden')
+          }
+
+          inputs.toggleClass('readonly-style')       
+               
+        }
+
+
+
+
+        $('#submit').on('click',update_member);
+
+        async function update_member(e){
+
+         e.preventDefault()
+
+         let inputs = $(this).parent().prevAll().find('input')
+         let id = inputs.closest('.accordion-item').find('.accordion-button span')
+
+       
+         let updateInfo = {
+
+            Id:id.text().trim(),
+            Name:inputs.eq(0).val() ,
+            Email:inputs.eq(1).val(),
+            Age:inputs.eq(2).val()
+
+         }
+ 
+
+         await $.post(`@Url.Content("~/Member/Update")`,updateInfo).done(s=>alert('更改成功')).fail(e=>console.log('失敗'+ e))
+
+
+
+         toggle_update.call(this);
+        
+         }
 
 
     </script>

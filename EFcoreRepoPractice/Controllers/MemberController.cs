@@ -328,7 +328,7 @@ namespace EFcoreRepoPractice.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<MemberDTO?>> Update([FromBody] UpdateMemberCommand cmd, CancellationToken ct)
+        public async Task<ActionResult<MemberDTO?>> Update(UpdateMemberCommand cmd, CancellationToken ct)
         {
 
 
