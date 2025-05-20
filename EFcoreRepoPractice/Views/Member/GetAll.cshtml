@@ -47,24 +47,23 @@
                     <div class="row justify-content-around">
                         <div class="col-2">
                             <div>
-                                <strong>姓名：</strong> <span>@c.Name</span>
+                                <strong>姓名：</strong> <input type="text" value="@c.Name" readonly > 
                             </div>
                         </div>
 
                         <div class="col-2">
                             <div>
-                                <strong>Email：</strong> <span>@c.Email</span>
+                                <strong>Email：</strong> <input type="text" value="@c.Email" readonly style="width:230px">
                             </div>
                         </div>
 
                         <div class="col-2">
                             <div>
-                                <strong>年齡：</strong> <span>@c.Age</span>
+                                <strong>年齡：</strong> <input type="text" value="@c.Age" readonly>
                             </div>
                         </div>
-
                         <div class="col-2 buttons">
-                            <a class="btn btn-sm btn-warning" href="#">編輯</a>
+                            <a class="btn btn-sm btn-warning editBtn" href="#" id="edit_@c.Id" onclick="">編輯</a>
                             @if (ViewBag.User != c.Email)
                             {
                                 <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@c.Id">刪除</a>
@@ -123,6 +122,27 @@
 
 
         })
+
+         
+
+        $('.editBtn').on('click',toggle_update)
+
+        function toggle_update(){
+
+          let inputs =  $(this).closest('.row').find('input')
+
+          if( inputs.attr('readonly'))
+          {
+             inputs.removeAttr('readonly')
+          }
+          else
+          {
+             inputs.attr('readonly','readonly')
+          }
+        
+       
+        
+        }
 
 
     </script>
