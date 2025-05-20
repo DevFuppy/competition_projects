@@ -185,7 +185,7 @@
 
             $.ajax({
                 url:'@Url.Content("~/Member/AjaxPostFromForm")',
-                method:'post',
+                type:'post',
                 contentType:'application/x-www-form-urlencoded', //可寫可不寫
                 // data:form
                 data: directObj
@@ -225,7 +225,7 @@
              $.ajax({
 
                 url:'@Url.Content("~/Member/AjaxPostFromForm")',
-                method:'post',             
+                type:'post',             
                 data: formdata2,
                 processData:false,
                 contentType:false
@@ -236,7 +236,7 @@
 
                  $.ajax({
                           url:'@Url.Content("~/Member/AjaxPostFromForm")',
-                          method:'post',
+                          type:'post',
                           data: formdata,                
                           processData:false,
                           contentType:false
@@ -401,7 +401,7 @@
 
          $.ajax({
               url:`@Url.Content("~/Member/AjaxPostFromForm")`,
-             method:'post',
+             type:'post',
              data: paraObj,
             // contentType:'application/json',
              success:(e)=>{ alert("成功"); console.log(e)},
@@ -412,7 +412,7 @@
 
          $('#jQueryAjaxGet').on('click',()=>{
              $.ajax({
-             method:'get',
+             type:'get',
               url:'@Url.Content("~/Member/AjaxGet")',
              data:{Email:testObj.Email}
              }).done((e)=>{console.log(e)}).fail(()=>{console.log('失敗')});

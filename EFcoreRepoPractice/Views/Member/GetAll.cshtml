@@ -147,6 +147,62 @@
         })
 
 
+
+        $('.editBtn').on('click',toggle_update);      
+
+        function toggle_update(){
+
+          let theRow = $(this).closest('.row')
+          let inputs = theRow .find('input')
+          let submit = theRow. find('button#submit') 
+
+          if( inputs.attr('readonly'))
+          {
+             inputs.removeAttr('readonly')
+             submit.removeAttr('hidden')
+          }
+          else
+          {
+             inputs.attr('readonly','readonly')
+             submit.attr('hidden','hidden')
+          }
+
+          inputs.toggleClass('readonly-style')       
+               
+        }
+
+
+
+
+        $('#submit').on('click',update_member);
+
+        async function update_member(e){
+
+         e.preventDefault()
+
+         let inputs = $(this).parent().prevAll().find('input')
+         let id = inputs.closest('.accordion-item').find('.accordion-button span')
+
+       
+         let updateInfo = {
+
+            Id:id.text().trim(),
+            Name:inputs.eq(0).val() ,
+            Email:inputs.eq(1).val(),
+            Age:inputs.eq(2).val()
+
+         }
+ 
+
+         await $.post(`@Url.Content("~/Member/Update")`,updateInfo).done(s=>alert('更改成功')).fail(e=>console.log('失敗'+ e))
+
+
+
+         toggle_update.call(this);
+        
+         }
+
+
     </script>
 
 }
