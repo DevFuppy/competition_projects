@@ -16,79 +16,89 @@
     <h2 style="color:lightseagreen">@TempData["LoginMsg"]</h2>
 }
 
+@section Styles {
+    <style>
+        .readonly-style {
+            background-color: #343a40; /* 深灰：與暗色背景區隔但不突兀 */
+            color: #ced4da; /* Bootstrap text-light 類系的亮灰白 */
+            border: 1px solid #495057; /* 深邊框，略低調但有存在感 */
+            cursor: not-allowed; /* 滑鼠提示為無法編輯 */
+        }
 
-<style>
-    .readonly-style {
-        background-color: #343a40; /* 深灰：與暗色背景區隔但不突兀 */
-        color: #ced4da; /* Bootstrap text-light 類系的亮灰白 */
-        border: 1px solid #495057; /* 深邊框，略低調但有存在感 */
-        cursor: not-allowed; /* 滑鼠提示為無法編輯 */
-    }
+    </style>
+}
 
-</style>
+<div class="container">
+    <div class="row justify-content-between align-items-center mt-4 mb-3"  >
 
-<div>
+        <div style="" class="col-2">
+            <h2 class="mb-4" style="display:inline">會員列表</h2>
 
-    <button id="logOut">登出</button>
+        </div>
 
-</div>
+        <div class="col-1 d-flex justify-content-end">
 
+            <button id="logOut">登出</button>
 
-<div style="height:60px">
-    <h2 class="mb-4" style="display:inline">會員列表</h2>
-
-</div>
+        </div>
+    </div>
 
 
-<div class="accordion" id="accordionExample">
-    @foreach (var c in memberList)
-    {
-        <div class="accordion-item">
-            <h2 class="accordion-header">
-                <button class="accordion-button @(ViewBag.User == c.Email ? "" : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@c.Id" aria-expanded="true" aria-controls="collapse-@c.Id">
-                    編號：<span>  @c.Id </span>@(ViewBag.User == c.Email ? " [現正登入]" : "")
-                </button>
-            </h2>
-            <div id="collapse-@c.Id" class="accordion-collapse collapse @(ViewBag.User == c.Email ? "show" : "") ">
-                <div class="accordion-body">
+    <div class="accordion" id="accordionExample">
+        @foreach (var c in memberList)
+        {
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button @(ViewBag.User == c.Email ? "" : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@c.Id" aria-expanded="true" aria-controls="collapse-@c.Id">
+                        編號：<span>  @c.Id </span>@(ViewBag.User == c.Email ? " [現正登入]" : "")
+                    </button>
+                </h2>
+                <div id="collapse-@c.Id" class="accordion-collapse collapse @(ViewBag.User == c.Email ? "show" : "") ">
+                    <div class="accordion-body">
 
-                    <div class="row justify-content-around">
-                        <div class="col-2">
-                            <div>
-                                <strong>姓名：</strong> <input type="text" value="@c.Name" readonly class="readonly-style">
+                        <div class="row justify-content-around">
+                            <div class="col ">
+                                <div>
+                                    <strong>姓名：</strong> <input type="text" value="@c.Name" readonly class="readonly-style">
+                                </div>
+                            </div>
+
+                            <div class="col ">
+                                <div class="item">
+                                    <strong>Email：</strong> <input type="text" value="@c.Email" readonly class="w-75 readonly-style">
+                                </div>
+                            </div>
+
+                            <div class="col ">
+                                <div class="">
+                                    <strong>年齡：</strong> <input type="text" value="@c.Age" class="readonly-style" readonly>
+                                </div>
+                            </div>
+                            <div class="col-2 buttons">
+                                <div class="position-relative d-inline-block">
+                                    <button type="button" class="btn btn-sm btn-warning editBtn " id="edit" onclick="">
+                                        編輯
+                                    </button>
+                                    <span class="btn position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger visually-hidden closeEdit" id="">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-success visually-hidden offset-1 submit" id="" onclick="">送出</button>
+
+                                @if (ViewBag.User != c.Email)
+                                {
+                                    <a class="btn btn-sm btn-danger offset-1" asp-action="Delete" asp-route-id="@c.Id">刪除</a>
+                                }
                             </div>
                         </div>
 
-                        <div class="col-2">
-                            <div>
-                                <strong>Email：</strong> <input type="text" value="@c.Email" readonly class="readonly-style" style="width:230px">
-                            </div>
-                        </div>
-
-                        <div class="col-2">
-                            <div>
-                                <strong>年齡：</strong> <input type="text" value="@c.Age" class="readonly-style" readonly>
-                            </div>
-                        </div>
-                        <div class="col-2">
-                            <button class="btn btn-sm btn-outline-success" id="submit" hidden onclick="">送出</button>
-                        </div>
-                        <div class="col-2 buttons">
-                            <a class="btn btn-sm btn-warning editBtn" href="#" id="edit"  onclick="">編輯</a>
-                            @if (ViewBag.User != c.Email)
-                            {
-                                <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@c.Id">刪除</a>
-                            }
-                        </div>
                     </div>
-
                 </div>
             </div>
-        </div>
-    }
+        }
+    </div>
+
 </div>
-
-
 
 @section Scripts {
 
@@ -136,46 +146,86 @@
 
 
 
-        $('.editBtn').on('click',toggle_update);      
+        $('.editBtn').on('click',function(){
 
-        function toggle_update(){
+            let This =  $(this)
+            toggle_update.call(This,true);
+            This.prop('disabled',true)
 
-          let theRow = $(this).closest('.row')
-          let inputs = theRow .find('input')
-          let submit = theRow. find('button#submit')
+        });
 
-          console.log(this)
-         
-          
 
-          if( inputs.attr('readonly'))
+         $('.closeEdit').on('click',(e)=>{
+
+           // e.stopPropagation();
+           toggle_update.call(e.target,false);
+
+        })
+
+        $('.submit').on('click', async (e)=>{
+
+            await update_memberAsync.call(e.target);
+            toggle_update.call(e.target,false);
+
+        });
+
+
+        function toggle_update(on){
+
+          let This = $(this);
+          let theRow = This.closest('.row')
+          let inputs = theRow.find('input')
+          let submit = theRow.find('button.submit')
+          let closeEdit = theRow.find('.closeEdit')
+
+
+          inputs.each((i,v)=>{
+
+              //無暫存值，不存("送出"不走)
+              if(!$(v).attr('data-ori')) $(v).attr('data-ori',v.value)
+
+          })
+
+
+          if(on)
           {
-             inputs.removeAttr('readonly')
-             submit.removeAttr('hidden')
+            inputs.removeAttr('readonly');
+            submit.removeClass('visually-hidden');
+            inputs.removeClass('readonly-style');
+            closeEdit.removeClass('visually-hidden')
           }
           else
           {
-             inputs.attr('readonly','readonly')
-             submit.attr('hidden','hidden')
-          }
+              //有暫存值才更新("送出"不走) p.s."送出"有全清
+              if(inputs.attr('data-ori'))
+                 {
+                     inputs.each( (i,v)=>{
 
-          inputs.toggleClass('readonly-style')       
-               
+                        v.value =  $(v).attr('data-ori') ;
+                        $(v).removeAttr('data-ori');
+                     })
+                 }
+
+
+            inputs.attr('readonly','readonly');
+            submit.addClass('visually-hidden');
+            inputs.addClass('readonly-style')
+            closeEdit.addClass('visually-hidden')
+            $('.editBtn').prop('disabled',false)
+          }
         }
 
 
 
 
-        $('#submit').on('click',update_member);
+        async function update_memberAsync(){
 
-        async function update_member(e){
-
-         e.preventDefault()
 
          let inputs = $(this).parent().prevAll().find('input')
          let id = inputs.closest('.accordion-item').find('.accordion-button span')
 
-       
+
+
          let updateInfo = {
 
             Id:id.text().trim(),
@@ -184,14 +234,14 @@
             Age:inputs.eq(2).val()
 
          }
- 
 
          await $.post(`@Url.Content("~/Member/Update")`,updateInfo).done(s=>alert('更改成功')).fail(e=>console.log('失敗'+ e))
 
+            //( 無暫存資料者無"送出"路徑)
+            inputs.each( (i,v)=>{
+                 $(v).removeAttr('data-ori') ;
+            })
 
-
-         toggle_update.call(this);
-        
          }
 
 
@@ -199,15 +249,3 @@
 
 }
 
-@* 模板 *@
-@* 
-<tr>
-    <td>2</td>
-    <td>demoUser02</td>
-    <td>2025-04-29</td>
-    <td>
-        <a class="btn btn-sm btn-primary" href="#">檢視</a>
-        <a class="btn btn-sm btn-warning" href="#">編輯</a>
-        <a class="btn btn-sm btn-danger" href="#">刪除</a>
-    </td>
-</tr> *@
