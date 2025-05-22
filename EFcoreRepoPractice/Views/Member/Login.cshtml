@@ -55,7 +55,7 @@
 </div>
 
 
-<div class="container border border-3 border-danger-subtle rounded-2 ">
+<div class="container border border-3 border-danger-subtle rounded-2 " data-bs-theme="light">
 
     <div class="row  ">
         <h4>FormAjax測試</h4>
@@ -71,13 +71,13 @@
                 </div>
             </div>
             <div class="row  ">
-                <div class="col-sm-2 d-flex ">
+                <div class="col-sm-2 d-flex " >
                     <button type="submit" class="btn btn-primary" id="jQPostForm">jQPostForm</button>
                     <button type="submit" class="btn btn-outline-info" id="jQueryGetForm">jQueryGetForm</button>
                     <button type="submit" class="btn btn-secondary" id="JQajaxPostForm">JQajaxPostForm</button>
                     <button type="submit" class="btn btn-secondary" id="JQajaxPostFormData">JQajaxPostFormData</button>
-                    <button type="submit" class="btn btn-outline-dark" id="jsFetchPostForm" onclick="">jsFetchPostForm</button>
-                    <button type="submit" class="btn btn-outline-dark" id="jsFetchPostFormData" onclick="">jsFetchPostFormData</button>
+                    <button type="submit" class="btn btn-outline-warning" id="jsFetchPostForm" onclick="">jsFetchPostForm</button>
+                    <button type="submit" class="btn btn-outline-warning" id="jsFetchPostFormData" onclick="">jsFetchPostFormData</button>
                 </div>
             </div>
         </form>
@@ -91,8 +91,8 @@
             <button class="btn btn-outline-info" id="jQueryGet">jQueryGet</button>
             <button class="btn btn-secondary" id="jQueryAjaxPost">jQueryAjaxPost</button>
             <button class="btn btn-secondary" id="jQueryAjaxGet">jQueryAjaxGet</button>
-            <button class="btn btn-outline-dark" id="jsAsyncFetchGet" onclick="notFormGet()">jsAsyncFetchGet</button>
-            <button class="btn btn-outline-dark" id="jsAsyncFetchPost" onclick="notFormPost()">jsAsyncFetchPostPromise</button>
+            <button class="btn btn-outline-warning" id="jsAsyncFetchGet" onclick="notFormGet()">jsAsyncFetchGet</button>
+            <button class="btn btn-outline-warning" id="jsAsyncFetchPost" onclick="notFormPost()">jsAsyncFetchPostPromise</button>
         </div>
 
     </div>
@@ -399,6 +399,8 @@
              let paraObj = {...testObj};
                  paraObj[tokenName] = t1;
 
+
+
          $.ajax({
               url:`@Url.Content("~/Member/AjaxPostFromForm")`,
              type:'post',
@@ -443,7 +445,11 @@
             let paraObj = {...testObj}
             paraObj[tokenName] = t1;
 
-            let data = new URLSearchParams(paraObj)
+           
+
+             let objEntriesInUrl = new URLSearchParams(Object.entries(paraObj));
+             let objInUrl = new URLSearchParams(paraObj);
+
 
             fetch( "@Url.Content("~/Member/AjaxPostFromForm")"
              // fetch( "@Url.Content("~/Member/AjaxFromBody")"
@@ -456,7 +462,8 @@
 
                      "Content-Type":"application/x-www-form-urlencoded" //Use [FromForm] or default at backend
                 },
-                   body:data
+                   body:objInUrl
+                   // body:objEntriesInUrl
                   // body:JSON.stringify(testObj)
               }).then((s)=>{
  
