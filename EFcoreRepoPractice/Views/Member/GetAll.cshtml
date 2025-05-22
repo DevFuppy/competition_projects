@@ -109,9 +109,7 @@
 
          let  msg = e.target.id
 
-         // console.log(msg)
-
-         alert(`已刪除${msg}`)
+         alert(`已刪除 ${msg}`)
 
         })
 
@@ -181,9 +179,10 @@
           let closeEdit = theRow.find('.closeEdit')
 
 
+          //暫存inputs內容
           inputs.each((i,v)=>{
 
-              //無暫存值，不存("送出"不走)
+              //無上次暫存紀錄(編輯、送出)才執行  
               if(!$(v).attr('data-ori')) $(v).attr('data-ori',v.value)
 
           })
@@ -198,7 +197,8 @@
           }
           else
           {
-              //有暫存值才更新("送出"不走) p.s."送出"有全清
+              //讀取暫存內容，回復inputs歷史
+              //有內容才讀取(叉叉取消的情況)，已清空狀態不讀(送出)
               if(inputs.attr('data-ori'))
                  {
                      inputs.each( (i,v)=>{
