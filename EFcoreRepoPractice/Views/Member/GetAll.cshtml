@@ -76,14 +76,14 @@
                             </div>
                             <div class="col-3 buttons">
                                 <div class="position-relative d-inline-block">
-                                    <button type="button" class="btn btn-sm btn-warning editBtn" id="edit" onclick="">
+                                    <button type="button" class="btn btn-sm btn-warning editBtn" id="" onclick="">
                                         編輯
                                     </button>
                                     <span class="btn position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger visually-hidden closeEdit" id="">
                                         <i class="fa-solid fa-xmark"></i>
                                     </span>
                                 </div>
-                                <button class="btn btn-sm btn-outline-success visually-hidden submit" id="" onclick="">送出</button>
+                                <button class="btn btn-sm btn-outline-success visually-hidden offset-1 submit" onclick="">送出</button>
 
                                 @if (ViewBag.User != c.Email)
                                 {
@@ -91,32 +91,37 @@
                                 }
                             </div>
                         </div>
-                        <div class="row justify-content-between mt-3 updatePwd">
-                            <div class="col-3">
+
+
+                        <form class="row justify-content-between mt-3 updatePwd">
+                            @Html.AntiForgeryToken()
+                            <div class="col-3 ">
                                 <div class="item">
-                                    <strong>新密碼：</strong> <input type="text" value="" class="readonly-style" readonly>
+                                    <strong>新密碼：</strong> <input name="password" type="text" class="readonly-style" readonly>
                                 </div>
                             </div>
                             <div class="col-3">
                                 <div class="">
-                                    <strong>確認新密碼：</strong> <input type="text" value="" class="readonly-style" readonly>
+                                    <strong>確認新密碼：</strong> <input name="confirmPassword" type="text" class="readonly-style" readonly>
                                 </div>
                             </div>
                             <div class="col-3 buttons">
                                 <div class="position-relative d-inline-block">
+
                                     <button type="button" class="btn btn-sm btn-info updateBtn">
                                         變更密碼
                                     </button>
                                     <button type="button" class="btn btn-sm btn-success submitUpdate visually-hidden">
                                         確認變更
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger cancelUpdate visually-hidden" id="edit" onclick="">
+                                    <button type="button" class="btn btn-sm btn-outline-danger cancelUpdate visually-hidden" onclick="">
                                         取消變更
                                     </button>
                                 </div>
                             </div>
 
-                        </div>
+                        </form>
+
                     </div>
                 </div>
             </div>
@@ -198,21 +203,50 @@
 
         $('.updateBtn').on('click',function(){
 
-          toggleUpgrateDOMs.call(this)
+            let Row = $(this).closest('.row')
+            toggleUpgrateDOMs.call(Row)
+
 
 
         })
 
         $('.cancelUpdate').on('click',function(){
 
-            toggleUpgrateDOMs.call(this)
+            let Row = $(this).closest('.row')
+            toggleUpgrateDOMs.call(Row)
+
+
 
         })
 
 
         $('.submitUpdate').on('click',function(){
 
-            toggleUpgrateDOMs.call(this)
+            let Row = $(this).closest('.row')
+
+            toggleUpgrateDOMs.call(Row)
+
+            let data = Row.serialize()+'&id='+Row.closest('.accordion-item').find('.accordion-header span').text()
+
+            $.post('@Url.Content("~/Member/UpdatePasswordBackend")',data)
+                .done((suc)=>{
+
+                    if(suc.success){
+                    alert('變更成功')
+                    }
+                    else
+                    {
+                    suc.msg.forEach(e=>alert(e))
+                    
+                    }
+                    
+            
+                }) 
+                .fail((err)=>{
+
+                     alert('變更失敗'+': '+err)
+                
+                }) 
 
         })
 
@@ -298,31 +332,30 @@
            let inputs =  Row.find('input');
            inputs.toggleClass('readonly-style');
 
-           if(!inputs.removeAttr('readonly'))
-            {
-                inputs.Attr('readonly','readonly')
-            }
-           else
-            {
-                inputs.removeAttr('readonly')
-            }
+           !!inputs.removeAttr('readonly')?inputs.removeAttr('readonly'):inputs.attr('readonly','readonly')
+
         }
+
 
         function toggle_updateBtn(btnClasses){
 
            let Row = $(this);
            let classString = btnClasses.join(',.')
            let btns =  Row.find(`button:is(.${classString})`);
+           let UpdateBtn = Row.find('.updateBtn');
 
            btns.toggleClass('visually-hidden');
+           UpdateBtn.prop('disabled',!UpdateBtn.prop('disabled'))
+
         }
+
 
         function toggleUpgrateDOMs(){
 
-            let Row = $(this).closest('.row')
+            let Row = $(this)
 
             toggle_updateInputs.call(Row)
-            toggle_updateBtn.call(Row,['submitUpdate','updateBtn','cancelUpdate'])
+            toggle_updateBtn.call(Row,['submitUpdate','cancelUpdate'])
 
 
         }

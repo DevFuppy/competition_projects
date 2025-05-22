@@ -42,6 +42,8 @@ namespace EFcoreRepoPractice.Controllers
         private readonly DeleteMemberHandler _memberDelete;
         private readonly LoginHandler _memberLogin;
         private readonly VerifyEmailHandler _emailhandler;
+        private readonly UpdatePasswordHandler _updatePasswordHandler;
+
 
         public MemberController(
             //IRepository<Member> IRepo,
@@ -52,7 +54,8 @@ namespace EFcoreRepoPractice.Controllers
             UpdateMemberHandler memberUpdate,
             DeleteMemberHandler memberDelete,
             LoginHandler memberLogin,
-            VerifyEmailHandler emailhandler
+            VerifyEmailHandler emailhandler,
+            UpdatePasswordHandler updatePasswordHandler
             )
         {
             //_context = context;
@@ -65,6 +68,7 @@ namespace EFcoreRepoPractice.Controllers
             _memberDelete = memberDelete;
             _memberLogin = memberLogin;
             _emailhandler = emailhandler;
+            _updatePasswordHandler = updatePasswordHandler;
         }
 
         ////[HttpPost]
@@ -118,7 +122,7 @@ namespace EFcoreRepoPractice.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<ActionResult> UpdatePasswordAction(UpdatePasswordViewModel up, CancellationToken ct)
+        public async Task<IActionResult> UpdatePasswordAction(UpdatePasswordViewModel up, CancellationToken ct)
         {
 
             dynamic result = await _emailhandler.UpdatePasswordWithTokenAsync(up, ct);
@@ -130,9 +134,45 @@ namespace EFcoreRepoPractice.Controllers
             return RedirectToAction("Login");
         }
 
+        #endregion
+
+
+        #region 後台變更密碼
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public async Task<ActionResult> UpdatePasswordBackend(UpdatePasswordBackendViewModel upb, CancellationToken ct)
+        {
+            List<string> errors = null;
+            bool success =false;
+
+            if (!ModelState.IsValid)
+            {
+                errors = new List<string>();
+
+                foreach (var i in ModelState.Values)
+                {
+                    foreach (var error in i.Errors)
+                    {
+                        errors.Add(error.ErrorMessage);
+                    
+                    }
+                    
+                }
+
+                return Ok(new { success, msg = errors });
+            }
+
+
+            MemberDTO? result = await _updatePasswordHandler.UpdatePasswordAsync(new(upb.Id,upb.Password), ct);
+            success = true;
+
+            return Ok(new { success ,msg = errors});
+        }
 
 
         #endregion
+
+
 
         #region 登入/登出
 
