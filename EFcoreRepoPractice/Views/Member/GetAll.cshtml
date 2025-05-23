@@ -214,12 +214,9 @@
 
             let Row = $(this).closest('.row')
             toggleUpgrateDOMs.call(Row)
-            Row.find('input').val('')
+            Row.find('input:is(:not([name="__RequestVerificationToken"]))').val('')
 
         })
-
-        let k;
-        let g;
 
         $('.submitUpdate').on('click', async function(){
 
@@ -227,8 +224,7 @@
 
             let data = Row.serialize()+'&id='+Row.closest('.accordion-item').find('.accordion-header span').text()
 
-            let token='';
- 
+            // let token=''; 
 
            await $.post('@Url.Content("~/Member/UpdatePasswordBackend")',data)
                 .done((suc)=>{
@@ -246,9 +242,9 @@
 
                         }
 
-                        token =  suc.token
+                        // token =  suc.token
 
-                        Row.find('[name="__RequestVerificationToken"]').val(suc.token)
+                        // Row.find('[name="__RequestVerificationToken"]').val(suc.token)
 
                     })
 
@@ -260,8 +256,8 @@
                      })
 
 
-                  Row.find('input').val('');
-                  Row.find('[name="__RequestVerificationToken"]').val(token)
+                  Row.find('input:is(:not([name="__RequestVerificationToken"]))').val('');
+                  // Row.find('[name="__RequestVerificationToken"]').val(token)
 
 
         })
