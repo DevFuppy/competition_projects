@@ -29,7 +29,7 @@
 }
 
 <div class="container">
-    <div class="row justify-content-between align-items-center mt-4 mb-3"  >
+    <div class="row justify-content-between align-items-center mt-4 mb-3">
 
         <div style="" class="col-2">
             <h2 class="mb-4" style="display:inline">會員列表</h2>
@@ -74,16 +74,16 @@
                                     <strong>年齡：</strong> <input type="text" value="@c.Age" class="readonly-style" readonly>
                                 </div>
                             </div>
-                            <div class="col-2 buttons">
+                            <div class="col-3 buttons">
                                 <div class="position-relative d-inline-block">
-                                    <button type="button" class="btn btn-sm btn-warning editBtn " id="edit" onclick="">
+                                    <button type="button" class="btn btn-sm btn-warning editBtn" id="" onclick="">
                                         編輯
                                     </button>
                                     <span class="btn position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger visually-hidden closeEdit" id="">
                                         <i class="fa-solid fa-xmark"></i>
                                     </span>
                                 </div>
-                                <button class="btn btn-sm btn-outline-success visually-hidden offset-1 submit" id="" onclick="">送出</button>
+                                <button class="btn btn-sm btn-outline-success visually-hidden offset-1 submit" onclick="">送出</button>
 
                                 @if (ViewBag.User != c.Email)
                                 {
@@ -91,6 +91,36 @@
                                 }
                             </div>
                         </div>
+
+
+                        <form class="row justify-content-between mt-3 updatePwd">
+                            @Html.AntiForgeryToken()
+                            <div class="col-3 ">
+                                <div class="item">
+                                    <strong>新密碼：</strong> <input name="password" type="password" class="readonly-style" readonly>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="">
+                                    <strong>確認新密碼：</strong> <input name="confirmPassword" type="password" class="readonly-style" readonly>
+                                </div>
+                            </div>
+                            <div class="col-3 buttons">
+                                <div class="position-relative d-inline-block">
+
+                                    <button type="button" class="btn btn-sm btn-info updateBtn">
+                                        變更密碼
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-success submitUpdate visually-hidden">
+                                        確認變更
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger cancelUpdate visually-hidden" onclick="">
+                                        取消變更
+                                    </button>
+                                </div>
+                            </div>
+
+                        </form>
 
                     </div>
                 </div>
@@ -113,6 +143,7 @@
 
         })
 
+
         $('#logOut').on('click', async function(){
 
             const response = await $.post('/Member/LogOut', (e)=>{
@@ -130,6 +161,7 @@
 
         })
 
+
         $('document').ready(
         ()=>{
 
@@ -143,24 +175,23 @@
         })
 
 
-
         $('.editBtn').on('click',function(){
 
             let This =  $(this)
             toggle_update.call(This,true);
             This.prop('disabled',true)
 
-      
+
         });
 
- 
 
-         $('.closeEdit').on('click',(e)=>{
+        $('.closeEdit').on('click',(e)=>{
 
            // e.stopPropagation();
            toggle_update.call(e.target,false);
 
         })
+
 
         $('.submit').on('click', async (e)=>{
 
@@ -168,6 +199,69 @@
             toggle_update.call(e.target,false);
 
         });
+
+
+        $('.updateBtn').on('click',function(){
+
+            let Row = $(this).closest('.row')
+            toggleUpgrateDOMs.call(Row)
+
+
+
+        })
+
+        $('.cancelUpdate').on('click',function(){
+
+            let Row = $(this).closest('.row')
+            toggleUpgrateDOMs.call(Row)
+            Row.find('input:is(:not([name="__RequestVerificationToken"]))').val('')
+
+        })
+
+        $('.submitUpdate').on('click', async function(){
+
+            let Row = $(this).closest('.row')
+
+            // let data = Row.serialize()+'&id='+Row.closest('.accordion-item').find('.accordion-header span').text()
+            let data = Row.serialize()+'&id=' + Row.closest('.accordion-item').find('.accordion-header span').text()
+
+            // let token=''; 
+
+           await $.post('@Url.Content("~/Member/UpdatePasswordBackend")',data)
+                .done((suc)=>{
+
+                    if(suc.success)
+                        {
+
+                            alert('變更成功')
+                            toggleUpgrateDOMs.call(Row)
+                        }
+                    else
+                        {
+
+                            suc.msg.forEach(e=>alert(e))
+
+                        }
+
+                        // token =  suc.token
+
+                        // Row.find('[name="__RequestVerificationToken"]').val(suc.token)
+
+                    })
+
+                .fail((err)=>{
+
+                     alert('變更失敗，請聯絡管理員')
+                     console.log(err)
+
+                     })
+
+
+                  Row.find('input:is(:not([name="__RequestVerificationToken"]))').val('');
+                  // Row.find('[name="__RequestVerificationToken"]').val(token)
+
+
+        })
 
 
         function toggle_update(on){
@@ -182,7 +276,7 @@
           //暫存inputs內容
           inputs.each((i,v)=>{
 
-              //無上次暫存紀錄(編輯、送出)才執行  
+              //無上次暫存紀錄(編輯、送出)才執行
               if(!$(v).attr('data-ori')) $(v).attr('data-ori',v.value)
 
           })
@@ -218,8 +312,6 @@
         }
 
 
-
-
         async function update_memberAsync(){
 
 
@@ -245,6 +337,40 @@
             })
 
          }
+
+         
+        function toggle_updateInputs(){
+
+           let Row = $(this);
+           let inputs =  Row.find('input:is(:not([name="__RequestVerificationToken"]))');
+           inputs.toggleClass('readonly-style');
+                  
+           !!inputs.attr('readonly') ? inputs.removeAttr('readonly') : inputs.attr('readonly','readonly')            
+        }
+
+
+        function toggle_updateBtn(btnClasses){
+
+           let Row = $(this);
+           let classString = btnClasses.join(',.')
+           let btns =  Row.find(`button:is(.${classString})`);
+           let UpdateBtn = Row.find('.updateBtn');
+
+           btns.toggleClass('visually-hidden');
+           UpdateBtn.prop('disabled',!UpdateBtn.prop('disabled'))
+
+        }
+
+
+        function toggleUpgrateDOMs(){
+
+            let Row = $(this)
+
+            toggle_updateInputs.call(Row)
+            toggle_updateBtn.call(Row,['submitUpdate','cancelUpdate'])
+
+
+        }
 
 
     </script>

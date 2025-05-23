@@ -40,6 +40,7 @@ builder.Services.AddScoped<UpdateMemberHandler>();
 builder.Services.AddScoped<DeleteMemberHandler>();
 builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<VerifyEmailHandler>();
+builder.Services.AddScoped<UpdatePasswordHandler>();
 
 
 //³q¥Îª©
