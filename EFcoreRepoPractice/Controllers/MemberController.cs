@@ -43,7 +43,7 @@ namespace EFcoreRepoPractice.Controllers
         private readonly LoginHandler _memberLogin;
         private readonly VerifyEmailHandler _emailhandler;
         private readonly UpdatePasswordHandler _updatePasswordHandler;
-
+        private readonly IAntiforgery _antiforgery;
 
         public MemberController(
             //IRepository<Member> IRepo,
@@ -55,7 +55,8 @@ namespace EFcoreRepoPractice.Controllers
             DeleteMemberHandler memberDelete,
             LoginHandler memberLogin,
             VerifyEmailHandler emailhandler,
-            UpdatePasswordHandler updatePasswordHandler
+            UpdatePasswordHandler updatePasswordHandler,
+            IAntiforgery antiforgery
             )
         {
             //_context = context;
@@ -69,6 +70,7 @@ namespace EFcoreRepoPractice.Controllers
             _memberLogin = memberLogin;
             _emailhandler = emailhandler;
             _updatePasswordHandler = updatePasswordHandler;
+            _antiforgery = antiforgery;
         }
 
         ////[HttpPost]
@@ -136,12 +138,14 @@ namespace EFcoreRepoPractice.Controllers
 
         #endregion
 
-
         #region 後台變更密碼
         [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<ActionResult> UpdatePasswordBackend(UpdatePasswordBackendViewModel upb, CancellationToken ct)
         {
+
+            string? token = _antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
+            
             List<string> errors = null;
             bool success =false;
 
@@ -159,20 +163,18 @@ namespace EFcoreRepoPractice.Controllers
                     
                 }
 
-                return Ok(new { success, msg = errors });
+                return Ok(new { success, msg = errors , token });
             }
 
 
             MemberDTO? result = await _updatePasswordHandler.UpdatePasswordAsync(new(upb.Id,upb.Password), ct);
             success = true;
 
-            return Ok(new { success ,msg = errors});
+            return Ok(new { success ,msg = errors, token});
         }
 
 
         #endregion
-
-
 
         #region 登入/登出
 
@@ -489,6 +491,5 @@ namespace EFcoreRepoPractice.Controllers
 
         #endregion
     }
-
 
 }

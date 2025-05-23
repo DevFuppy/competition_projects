@@ -97,12 +97,12 @@
                             @Html.AntiForgeryToken()
                             <div class="col-3 ">
                                 <div class="item">
-                                    <strong>新密碼：</strong> <input name="password" type="text" class="readonly-style" readonly>
+                                    <strong>新密碼：</strong> <input name="password" type="password" class="readonly-style" readonly>
                                 </div>
                             </div>
                             <div class="col-3">
                                 <div class="">
-                                    <strong>確認新密碼：</strong> <input name="confirmPassword" type="text" class="readonly-style" readonly>
+                                    <strong>確認新密碼：</strong> <input name="confirmPassword" type="password" class="readonly-style" readonly>
                                 </div>
                             </div>
                             <div class="col-3 buttons">
@@ -214,39 +214,55 @@
 
             let Row = $(this).closest('.row')
             toggleUpgrateDOMs.call(Row)
-
-
+            Row.find('input').val('')
 
         })
 
+        let k;
+        let g;
 
-        $('.submitUpdate').on('click',function(){
+        $('.submitUpdate').on('click', async function(){
 
             let Row = $(this).closest('.row')
 
-            toggleUpgrateDOMs.call(Row)
-
             let data = Row.serialize()+'&id='+Row.closest('.accordion-item').find('.accordion-header span').text()
 
-            $.post('@Url.Content("~/Member/UpdatePasswordBackend")',data)
+            let token='';
+ 
+
+           await $.post('@Url.Content("~/Member/UpdatePasswordBackend")',data)
                 .done((suc)=>{
 
-                    if(suc.success){
-                    alert('變更成功')
-                    }
+                    if(suc.success)
+                        {
+
+                            alert('變更成功')
+                            toggleUpgrateDOMs.call(Row)
+                        }
                     else
-                    {
-                    suc.msg.forEach(e=>alert(e))
-                    
-                    }
-                    
-            
-                }) 
+                        {
+
+                            suc.msg.forEach(e=>alert(e))
+
+                        }
+
+                        token =  suc.token
+
+                        Row.find('[name="__RequestVerificationToken"]').val(suc.token)
+
+                    })
+
                 .fail((err)=>{
 
-                     alert('變更失敗'+': '+err)
-                
-                }) 
+                     alert('變更失敗，請聯絡管理員')
+                     console.log(err)
+
+                     })
+
+
+                  Row.find('input').val('');
+                  Row.find('[name="__RequestVerificationToken"]').val(token)
+
 
         })
 
