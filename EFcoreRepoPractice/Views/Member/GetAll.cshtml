@@ -222,7 +222,8 @@
 
             let Row = $(this).closest('.row')
 
-            let data = Row.serialize()+'&id='+Row.closest('.accordion-item').find('.accordion-header span').text()
+            // let data = Row.serialize()+'&id='+Row.closest('.accordion-item').find('.accordion-header span').text()
+            let data = Row.serialize()+'&id=' + Row.closest('.accordion-item').find('.accordion-header span').text()
 
             // let token=''; 
 
@@ -337,15 +338,14 @@
 
          }
 
-
+         
         function toggle_updateInputs(){
 
            let Row = $(this);
-           let inputs =  Row.find('input');
+           let inputs =  Row.find('input:is(:not([name="__RequestVerificationToken"]))');
            inputs.toggleClass('readonly-style');
-
-           !!inputs.removeAttr('readonly')?inputs.removeAttr('readonly'):inputs.attr('readonly','readonly')
-
+                  
+           !!inputs.attr('readonly') ? inputs.removeAttr('readonly') : inputs.attr('readonly','readonly')            
         }
 
 
